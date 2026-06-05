@@ -186,7 +186,93 @@ OC.PositionCard = (function() {
       body.appendChild(section);
     }
 
-    // Custom fields
+    // ── Salary & Compensation ──────────────────
+    if (meta.salary && CONFIG.features.salaryBands) {
+      const salary = meta.salary;
+      const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+      const fmtCompact = (v) => {
+        if (v >= 1000000) return '$' + (v / 1000000).toFixed(1) + 'M';
+        if (v >= 1000) return '$' + Math.round(v / 1000) + 'K';
+        return fmt.format(v);
+      };
+
+      // Calculate salary position across all nodes
+      const allNodes = Store.flattenTree();
+      const salaries = allNodes.filter(n => n.metadata && n.metadata.salary).map(n => n.metadata.salary);
+      const minSalary = Math.min(...salaries);
+      const maxSalary = Math.max(...salaries);
+      const range = maxSalary - minSalary;
+      const pct = range > 0 ? ((salary - minSalary) / range) * 100 : 50;
+
+      // Division average
+      const divisionNodes = allNodes.filter(n => n.division === node.division && n.metadata && n.metadata.salary);
+      const divAvg = divisionNodes.length > 0
+        ? divisionNodes.reduce((s, n) => s + n.metadata.salary, 0) / divisionNodes.length
+        : salary;
+      const diffPct = divAvg > 0 ? ((salary - divAvg) / divAvg * 100).toFixed(0) : 0;
+      const isAbove = Number(diffPct) >= 0;
+
+      // Interpolate bar fill color across green → gold → red
+      const barColor = pct < 50
+        ? lerpColor('#22c55e', '#FDB927', pct / 50)
+        : lerpColor('#FDB927', '#ef4444', (pct - 50) / 50);
+
+      const section = el('div', { class: 'detail-section anim-fade-in' },
+        el('div', { class: 'detail-section-title' },
+          el('span', { innerHTML: Icons.dollarSign(14) }), 'Compensation'
+        )
+      );
+
+      // Salary display
+      const salaryDisplay = el('div', { class: 'salary-display' },
+        el('div', { class: 'salary-amount' }, fmt.format(salary)),
+        meta.salaryBand
+          ? el('div', { class: 'salary-band' }, meta.salaryBand)
+          : null
+      );
+      section.appendChild(salaryDisplay);
+
+      // Salary bar
+      const barFill = el('div', {
+        class: 'salary-bar-fill',
+        style: {
+          width: Math.max(2, pct) + '%',
+          background: 'linear-gradient(90deg, #22c55e, ' + barColor + ')'
+        }
+      });
+      const barMarker = el('div', {
+        class: 'salary-bar-marker',
+        style: { left: pct + '%', borderColor: barColor }
+      });
+      const barContainer = el('div', { class: 'salary-bar-container' },
+        el('div', { class: 'salary-bar-track' }, barFill, barMarker),
+        el('div', { class: 'salary-bar-labels' },
+          el('span', null, fmtCompact(minSalary)),
+          el('span', null, fmtCompact(maxSalary))
+        )
+      );
+      section.appendChild(barContainer);
+
+      // Comparison
+      const diffLabel = isAbove
+        ? '+' + Math.abs(diffPct) + '% above division avg (' + fmtCompact(divAvg) + ')'
+        : '-' + Math.abs(diffPct) + '% below division avg (' + fmtCompact(divAvg) + ')';
+      const comparison = el('div', { class: 'salary-comparison' },
+        el('span', {
+          class: 'salary-diff ' + (isAbove ? 'positive' : 'negative')
+        }, diffLabel)
+      );
+      section.appendChild(comparison);
+
+      // Data year
+      section.appendChild(
+        el('div', { class: 'salary-year' }, 'FY 2025 · Public Record')
+      );
+
+      body.appendChild(section);
+    }
+
+
     if (meta.custom && CONFIG.features.customFields) {
       const customEntries = Object.entries(meta.custom).filter(([k, v]) => v);
       if (customEntries.length > 0) {
@@ -379,6 +465,16 @@ OC.PositionCard = (function() {
   function truncate(str, maxLen) {
     if (!str || str.length <= maxLen) return str;
     return str.slice(0, maxLen) + '…';
+  }
+
+  function lerpColor(a, b, t) {
+    const ah = a.replace('#', ''), bh = b.replace('#', '');
+    const ar = parseInt(ah.substring(0, 2), 16), ag = parseInt(ah.substring(2, 4), 16), ab = parseInt(ah.substring(4, 6), 16);
+    const br = parseInt(bh.substring(0, 2), 16), bg = parseInt(bh.substring(2, 4), 16), bb = parseInt(bh.substring(4, 6), 16);
+    const rr = Math.round(ar + (br - ar) * t);
+    const rg = Math.round(ag + (bg - ag) * t);
+    const rb = Math.round(ab + (bb - ab) * t);
+    return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb).toString(16).slice(1);
   }
 
   return {

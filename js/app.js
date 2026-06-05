@@ -3,7 +3,7 @@
  * ============================================ */
 
 OC.App = (function() {
-  const { Utils, Store, Events, Theme, I18n, Header, TreeView, ChartView, PositionCard, Search, Admin, ImportExport, Analysis } = OC;
+  const { Utils, Store, Events, Theme, I18n, Header, TreeView, ChartView, PositionCard, Search, Admin, ImportExport, Analysis, ORI } = OC;
 
   function init() {
     console.log('%c OrgChart Platform ', 'background: #004684; color: #FDB927; font-weight: bold; padding: 4px 12px; border-radius: 4px;');
@@ -19,7 +19,8 @@ OC.App = (function() {
 
     // 3. UI modules
     Header.init();
-    TreeView.init();
+    if (ORI) ORI.init();       // ORI owns the sidebar — init first
+    TreeView.init();            // TreeView renders filters into stats bar
     ChartView.init();
     PositionCard.init();
 

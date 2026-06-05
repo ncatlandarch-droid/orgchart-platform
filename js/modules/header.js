@@ -1,5 +1,6 @@
 /* ============================================
  * ORGCHART PLATFORM — Header Module
+ * EMMA-style: NC A&T logo | separator | brand
  * ============================================ */
 
 OC.Header = (function() {
@@ -13,37 +14,49 @@ OC.Header = (function() {
     const cfg = CONFIG.organization;
     header.innerHTML = '';
 
-    // Brand — AVA-style layout: A&T mark | University Name + Tagline
-    const brandLeft = el('div', { class: 'header-brand' });
+    /* ── Top row: logo + brand + search + controls ── */
+    const topRow = el('div', { class: 'header-top-row' });
 
-    // A&T icon mark (gold/blue on dark header — no filter needed)
+    /* ── Left: Logo + Brand ── */
+    const headerLeft = el('div', { class: 'header-left' });
+
+    // NC A&T white logo (same file EMMA uses)
     const logoImg = document.createElement('img');
-    logoImg.src = 'assets/ncat-logo.png';
+    logoImg.src = 'assets/ncat-logo-white.png';
     logoImg.alt = 'NC A&T';
     logoImg.className = 'header-at-logo';
     logoImg.onerror = function() {
-      this.src = 'assets/ncat-logo-white.png';
+      this.src = 'assets/ncat-logo.png';
       this.onerror = function() {
-        this.parentElement.innerHTML = '<span style="font-weight:900;font-size:22px;color:#FDB927;">A&T</span>';
+        const fallback = el('span', { class: 'header-logo-fallback' }, 'A&T');
+        this.replaceWith(fallback);
       };
     };
-    brandLeft.appendChild(logoImg);
+    headerLeft.appendChild(logoImg);
 
-    // Vertical separator
-    const sep = el('span', { class: 'header-logo-separator' });
-    brandLeft.appendChild(sep);
+    // Vertical separator (EMMA pattern)
+    headerLeft.appendChild(el('div', { class: 'header-logo-separator' }));
 
-    // Text block: university name + tagline
-    const textBlock = el('div', { class: 'header-titles' });
-    const orgName = el('div', { class: 'header-org-name' });
-    orgName.innerHTML = 'North Carolina Agricultural<br>and Technical State University';
-    textBlock.appendChild(orgName);
-    textBlock.appendChild(
-      el('div', { class: 'header-tagline' }, cfg.tagline)
+    // Brand text — EMMA-style acronym letters highlighted
+    const brandBlock = el('div', { class: 'header-brand-text' });
+    const brandName = el('h1', { class: 'header-brand-name' });
+    // Highlight the O-R-G letters in accent gold
+    brandName.innerHTML =
+      '<span class="brand-letter">O</span><span class="brand-word">rganizational </span>' +
+      '<span class="brand-letter">R</span><span class="brand-word">esource </span>' +
+      '<span class="brand-letter">I</span><span class="brand-word">ntelligence</span>';
+    brandBlock.appendChild(brandName);
+
+    // Tagline — EMMA style
+    brandBlock.appendChild(
+      el('span', { class: 'header-brand-tagline' },
+        'POSITION INTELLIGENCE PLATFORM ― NORTH CAROLINA A&T STATE UNIVERSITY')
     );
-    brandLeft.appendChild(textBlock);
+    headerLeft.appendChild(brandBlock);
 
-    // Search
+    topRow.appendChild(headerLeft);
+
+    /* ── Center: Search ── */
     const searchWrap = el('div', { class: 'header-search' });
     const searchIcon = el('span', { class: 'header-search-icon', innerHTML: Icons.search(16) });
     const searchInput = el('input', {
@@ -55,9 +68,10 @@ OC.Header = (function() {
     searchInput.addEventListener('focus', () => Events.emit('search:open'));
     searchWrap.appendChild(searchIcon);
     searchWrap.appendChild(searchInput);
+    topRow.appendChild(searchWrap);
 
-    // Controls
-    const controls = el('div', { class: 'header-controls' });
+    /* ── Right: Controls ── */
+    const headerRight = el('div', { class: 'header-right' });
 
     // View toggle group
     const viewToggle = el('div', { class: 'view-toggle-group' });
@@ -85,45 +99,44 @@ OC.Header = (function() {
 
     viewToggle.appendChild(chartBtn);
     if (CONFIG.features.analysis) viewToggle.appendChild(analysisBtn);
-    controls.appendChild(viewToggle);
+    headerRight.appendChild(viewToggle);
 
     // Admin toggle
     if (CONFIG.features.adminEditing) {
       const adminBtn = el('button', {
-        class: 'header-btn',
+        class: 'header-control-btn',
         id: 'admin-toggle-btn',
-        innerHTML: Icons.edit(14) + ' <span>' + I18n.t('adminMode') + '</span>'
+        innerHTML: Icons.edit(14) + ' <span class="control-label">' + I18n.t('adminMode') + '</span>'
       });
       adminBtn.addEventListener('click', () => {
         const newState = !Store.getState().adminMode;
         Store.setAdminMode(newState);
         adminBtn.classList.toggle('active', newState);
       });
-      controls.appendChild(adminBtn);
+      headerRight.appendChild(adminBtn);
     }
 
-    // Export
+    // Export / Import
     if (CONFIG.features.importExport) {
       const exportBtn = el('button', {
-        class: 'header-btn',
+        class: 'header-control-btn',
         id: 'export-btn',
-        innerHTML: Icons.download(14) + ' <span>Export</span>'
+        innerHTML: Icons.download(14) + ' <span class="control-label">Export</span>'
       });
       exportBtn.addEventListener('click', () => Events.emit('export:open'));
-      controls.appendChild(exportBtn);
+      headerRight.appendChild(exportBtn);
 
       const importBtn = el('button', {
-        class: 'header-btn',
+        class: 'header-control-btn',
         id: 'import-btn',
-        innerHTML: Icons.upload(14) + ' <span>Import</span>'
+        innerHTML: Icons.upload(14) + ' <span class="control-label">Import</span>'
       });
       importBtn.addEventListener('click', () => Events.emit('import:open'));
-      controls.appendChild(importBtn);
+      headerRight.appendChild(importBtn);
     }
 
-    header.appendChild(brandLeft);
-    header.appendChild(searchWrap);
-    header.appendChild(controls);
+    topRow.appendChild(headerRight);
+    header.appendChild(topRow);
   }
 
   function updateViewBtns(activeView) {
@@ -161,10 +174,22 @@ OC.Header = (function() {
     });
   }
 
+  function renderFooter() {
+    // Don't double-render
+    if (Utils.$('.app-copyright-footer')) return;
+
+    const footer = el('footer', { class: 'app-copyright-footer' });
+    footer.innerHTML =
+      '<span>© 2026 Think! Design and Planning, LLC. All rights reserved.</span>' +
+      '<span>ORI — Organizational Resource Intelligence Platform | Proprietary Software</span>';
+    document.body.appendChild(footer);
+  }
+
   return {
     init() {
       render();
       renderStats();
+      renderFooter();
       Events.on('store:statsChanged', renderStats);
       Events.on('store:dataChanged', () => { render(); renderStats(); });
       Events.on('view:switchTo', (view) => {
