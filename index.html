@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Organizational Ecosystem & Position Intelligence — A comprehensive, interactive organizational chart platform for mapping positions, qualifications, and reporting chains.">
+  <meta name="theme-color" content="#004684">
+  <title>OrgChart Platform — NC A&T State University</title>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FDB927'/><text x='50' y='66' font-size='48' font-weight='900' text-anchor='middle' fill='%23004684'>A&amp;T</text></svg>">
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="loading-logo">A&T</div>
+    <div class="loading-text">Loading Organizational Data</div>
+    <div class="loading-bar">
+      <div class="loading-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header" id="app-header" role="banner">
+      <!-- Rendered by Header module -->
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="stats-bar" role="status" aria-label="Organization statistics">
+      <!-- Rendered by Header module -->
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content" role="main">
+
+      <!-- Left Sidebar: Tree View -->
+      <aside class="sidebar" id="sidebar" role="navigation" aria-label="Organization hierarchy">
+        <!-- Rendered by TreeView module -->
+      </aside>
+
+      <!-- Center: Chart View -->
+      <section class="center-panel" id="center-panel">
+        <div class="chart-container" id="chart-container">
+          <!-- Rendered by ChartView module -->
+        </div>
+      </section>
+
+      <!-- Right: Detail Panel -->
+      <aside class="detail-panel" id="detail-panel" role="complementary" aria-label="Position details">
+        <!-- Rendered by PositionCard module -->
+      </aside>
+
+    </main>
+  </div>
+
+  <!-- Scripts — loaded in dependency order -->
+  <!-- Core -->
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/theme.js"></script>
+
+  <!-- UI Modules -->
+  <script src="js/modules/header.js"></script>
+  <script src="js/modules/tree-view.js"></script>
+  <script src="js/modules/chart-view.js"></script>
+  <script src="js/modules/position-card.js"></script>
+  <script src="js/modules/search.js"></script>
+  <script src="js/modules/admin.js"></script>
+  <script src="js/modules/import-export.js"></script>
+  <script src="js/modules/analysis.js"></script>
+
+  <!-- App Init (must be last) -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
