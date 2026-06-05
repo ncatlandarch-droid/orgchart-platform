@@ -135,6 +135,10 @@ OC.Store = (function() {
       return CONFIG.departmentColors[dept] || CONFIG.departmentColors['default'] || '#64748b';
     },
 
+    getDeptIcon(dept) {
+      return CONFIG.departmentIcons ? CONFIG.departmentIcons[dept] || null : null;
+    },
+
     /* ── Actions ──────────────────────────── */
     select(id) {
       if (state.selectedId === id) return;

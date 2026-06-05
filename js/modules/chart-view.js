@@ -149,6 +149,20 @@ OC.ChartView = (function() {
       style: { background: `linear-gradient(90deg, ${deptColor}, ${deptColor}88)` }
     }));
 
+    // College icon badge (if available)
+    const chartDeptIcon = Store.getDeptIcon(node.department);
+    if (chartDeptIcon) {
+      const iconBadge = el('div', { class: 'chart-node-icon-badge' });
+      const iconImg = document.createElement('img');
+      iconImg.src = chartDeptIcon;
+      iconImg.alt = node.department;
+      iconImg.style.width = '22px';
+      iconImg.style.height = '22px';
+      iconImg.onerror = function() { this.parentElement.remove(); };
+      iconBadge.appendChild(iconImg);
+      nodeEl.appendChild(iconBadge);
+    }
+
     // Title
     nodeEl.appendChild(el('div', { class: 'chart-node-title' }, node.title));
 

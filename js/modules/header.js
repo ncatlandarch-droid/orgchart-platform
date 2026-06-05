@@ -13,17 +13,21 @@ OC.Header = (function() {
     const cfg = CONFIG.organization;
     header.innerHTML = '';
 
-    // Brand — use real NC A&T logo if available
+    // Brand — use official NC A&T SVG logo from hub.ncat.edu
     const logoEl = el('div', { class: 'header-logo' });
     const logoImg = document.createElement('img');
-    logoImg.src = 'assets/ncat-logo-white.png';
+    logoImg.src = 'assets/ncat-logo-white.svg';
     logoImg.alt = cfg.shortName + ' Logo';
     logoImg.onerror = function() {
-      // Fallback to text if image missing
-      this.parentElement.innerHTML = cfg.shortName ? cfg.shortName.replace(/[^A-Z&]/g, '').slice(0, 3) : 'OC';
-      this.parentElement.style.fontWeight = '900';
-      this.parentElement.style.fontSize = '14px';
-      this.parentElement.style.color = '#003366';
+      // Fallback to PNG if SVG fails
+      this.src = 'assets/ncat-logo-white.png';
+      this.onerror = function() {
+        // Final fallback to text
+        this.parentElement.innerHTML = cfg.shortName ? cfg.shortName.replace(/[^A-Z&]/g, '').slice(0, 3) : 'OC';
+        this.parentElement.style.fontWeight = '900';
+        this.parentElement.style.fontSize = '14px';
+        this.parentElement.style.color = '#FDB927';
+      };
     };
     logoEl.appendChild(logoImg);
 

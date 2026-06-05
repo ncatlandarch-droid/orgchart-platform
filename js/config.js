@@ -98,6 +98,19 @@ const CONFIG = {
     'default':                       '#64748b'
   },
 
+  /* ── College / Department Icons ──────────── */
+  departmentIcons: {
+    'Engineering':                     'assets/college-icons/icon-engineering-color.svg',
+    'Science & Technology':            'assets/college-icons/icon-science-color.svg',
+    'Agriculture & Environmental Sciences': 'assets/college-icons/icon-agriculture-color.svg',
+    'Business & Economics':            'assets/college-icons/icon-business-color.svg',
+    'Arts, Humanities & Social Sciences':   'assets/college-icons/icon-arts-color.svg',
+    'Education':                       'assets/college-icons/icon-education-color.svg',
+    'Health & Human Sciences':         'assets/college-icons/icon-health-color.svg',
+    'Nanoscience & Nanoengineering':   'assets/college-icons/icon-nano-color.svg',
+    'Graduate College':                'assets/college-icons/icon-graduate-color.svg'
+  },
+
   /* ── Internationalization ───────────────── */
   i18n: {
     defaultLocale: 'en',

@@ -36,14 +36,32 @@ OC.TreeView = (function() {
     sorted.forEach(([dept, count]) => {
       const color = Store.getDeptColor(dept);
       const isActive = activeDepts.includes(dept);
+      const deptIcon = Store.getDeptIcon(dept);
       const chip = el('button', {
         class: 'filter-chip' + (isActive ? ' active' : ''),
         style: { '--chip-color': color + 'cc' }
-      },
-        el('span', { class: 'filter-chip-dot', style: { backgroundColor: color } }),
-        dept,
-        el('span', { class: 'filter-chip-count' }, String(count))
-      );
+      });
+      // Icon or dot
+      if (deptIcon) {
+        const iconImg = document.createElement('img');
+        iconImg.src = deptIcon;
+        iconImg.alt = dept;
+        iconImg.className = 'filter-chip-icon';
+        iconImg.style.width = '14px';
+        iconImg.style.height = '14px';
+        iconImg.style.flexShrink = '0';
+        iconImg.onerror = function() {
+          this.replaceWith(Object.assign(document.createElement('span'), {
+            className: 'filter-chip-dot',
+            style: 'background-color:' + color
+          }));
+        };
+        chip.appendChild(iconImg);
+      } else {
+        chip.appendChild(el('span', { class: 'filter-chip-dot', style: { backgroundColor: color } }));
+      }
+      chip.appendChild(document.createTextNode(dept));
+      chip.appendChild(el('span', { class: 'filter-chip-count' }, String(count)));
       chip.addEventListener('click', () => {
         Store.toggleDepartmentFilter(dept);
         renderTree();
@@ -125,12 +143,31 @@ OC.TreeView = (function() {
       row.appendChild(el('span', { class: 'tree-expand-btn', style: { visibility: 'hidden' } }));
     }
 
-    // Department dot
-    const dot = el('span', {
-      class: 'tree-dept-dot',
-      style: { backgroundColor: deptColor, '--dot-color': deptColor }
-    });
-    row.appendChild(dot);
+    // Department icon or dot
+    const deptIcon = Store.getDeptIcon(node.department);
+    if (deptIcon) {
+      const iconImg = document.createElement('img');
+      iconImg.src = deptIcon;
+      iconImg.alt = node.department;
+      iconImg.className = 'tree-dept-icon';
+      iconImg.style.width = '16px';
+      iconImg.style.height = '16px';
+      iconImg.style.flexShrink = '0';
+      iconImg.onerror = function() {
+        // Fallback to dot if icon fails
+        this.replaceWith(Object.assign(document.createElement('span'), {
+          className: 'tree-dept-dot',
+          style: 'background-color:' + deptColor
+        }));
+      };
+      row.appendChild(iconImg);
+    } else {
+      const dot = el('span', {
+        class: 'tree-dept-dot',
+        style: { backgroundColor: deptColor, '--dot-color': deptColor }
+      });
+      row.appendChild(dot);
+    }
 
     // Label
     const label = el('span', { class: 'tree-node-label' }, node.title);

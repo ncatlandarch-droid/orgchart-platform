@@ -57,7 +57,22 @@ OC.PositionCard = (function() {
       class: 'detail-department',
       style: { background: deptColor + '18', color: deptColor, border: '1px solid ' + deptColor + '30' }
     });
-    deptBadge.appendChild(el('span', { style: { width: '6px', height: '6px', borderRadius: '50%', background: deptColor, display: 'inline-block' } }));
+    // College icon (if available)
+    const detailDeptIcon = Store.getDeptIcon(node.department);
+    if (detailDeptIcon) {
+      const deptIconImg = document.createElement('img');
+      deptIconImg.src = detailDeptIcon;
+      deptIconImg.alt = node.department;
+      deptIconImg.className = 'detail-dept-icon';
+      deptIconImg.style.width = '18px';
+      deptIconImg.style.height = '18px';
+      deptIconImg.style.verticalAlign = 'middle';
+      deptIconImg.style.marginRight = '4px';
+      deptIconImg.onerror = function() { this.remove(); };
+      deptBadge.appendChild(deptIconImg);
+    } else {
+      deptBadge.appendChild(el('span', { style: { width: '6px', height: '6px', borderRadius: '50%', background: deptColor, display: 'inline-block' } }));
+    }
     deptBadge.appendChild(document.createTextNode(node.department || 'Unknown'));
     headerSection.appendChild(deptBadge);
 
