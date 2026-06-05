@@ -1,6 +1,6 @@
 /* ============================================
  * ORGCHART PLATFORM — Tree View Module
- * Renders hierarchy filter chips into stats bar
+ * Renders hierarchy filter dropdowns in stats bar
  * (sidebar is now ORI-only)
  * ============================================ */
 
@@ -10,90 +10,217 @@ OC.TreeView = (function() {
 
   let filterContainer;
 
-  /* ── Filter Bar (renders into stats bar) ── */
-  function renderFilterBar() {
-    if (!CONFIG.features.departmentFilter) return null;
+  /* ── Close any open dropdown on outside click ── */
+  function setupOutsideClick() {
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.filter-dropdown')) {
+        document.querySelectorAll('.filter-dropdown.open').forEach(d => d.classList.remove('open'));
+      }
+    });
+  }
 
-    const bar = el('div', { class: 'hierarchy-filter-bar' });
+  /* ── Build Department Dropdown ── */
+  function buildDeptDropdown() {
     const depts = Store.getDepartments();
     const state = Store.getState();
     const activeDepts = state.filters.departments;
-    const activeStatuses = state.filters.statuses;
     const hasFilters = Store.hasActiveFilters();
+    const sorted = Object.entries(depts).sort((a, b) => b[1] - a[1]);
 
-    // "All" chip
-    const allChip = el('button', {
-      class: 'filter-chip filter-chip-all' + (!hasFilters ? ' active' : '')
-    }, 'All');
-    allChip.addEventListener('click', () => {
+    // Wrapper
+    const dropdown = el('div', { class: 'filter-dropdown' });
+
+    // Toggle button
+    const activeCount = activeDepts.length;
+    const label = activeCount === 0 ? 'All Departments' : activeCount + ' Selected';
+    const toggle = el('button', {
+      class: 'filter-dropdown-toggle' + (activeCount > 0 ? ' has-selection' : ''),
+      type: 'button'
+    },
+      el('span', { class: 'filter-dropdown-icon', innerHTML: Icons.network(14) }),
+      el('span', { class: 'filter-dropdown-label' }, label),
+      el('span', { class: 'filter-dropdown-arrow', innerHTML: '▾' })
+    );
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Close other dropdowns
+      document.querySelectorAll('.filter-dropdown.open').forEach(d => {
+        if (d !== dropdown) d.classList.remove('open');
+      });
+      dropdown.classList.toggle('open');
+    });
+    dropdown.appendChild(toggle);
+
+    // Menu
+    const menu = el('div', { class: 'filter-dropdown-menu' });
+
+    // "All" option
+    const allItem = el('div', {
+      class: 'filter-dropdown-item' + (!hasFilters ? ' active' : '')
+    },
+      el('span', { class: 'filter-check', innerHTML: !hasFilters ? '✓' : '' }),
+      el('span', { class: 'filter-item-label' }, 'All Departments'),
+      el('span', { class: 'filter-item-count' }, String(Object.values(depts).reduce((a, b) => a + b, 0)))
+    );
+    allItem.addEventListener('click', (e) => {
+      e.stopPropagation();
       Store.clearFilters();
       refreshFilters();
       if (OC.ChartView) OC.ChartView.refresh();
     });
-    bar.appendChild(allChip);
+    menu.appendChild(allItem);
 
-    // Department chips — sorted by count
-    const sorted = Object.entries(depts).sort((a, b) => b[1] - a[1]);
+    // Divider
+    menu.appendChild(el('div', { class: 'filter-dropdown-divider' }));
+
+    // Department items
     sorted.forEach(([dept, count]) => {
       const color = Store.getDeptColor(dept);
       const isActive = activeDepts.includes(dept);
-      const deptIcon = Store.getDeptIcon(dept);
-      const chip = el('button', {
-        class: 'filter-chip' + (isActive ? ' active' : ''),
-        style: { '--chip-color': color + 'cc' }
-      });
-      // Icon or dot
-      if (deptIcon) {
-        const iconImg = document.createElement('img');
-        iconImg.src = deptIcon;
-        iconImg.alt = dept;
-        iconImg.className = 'filter-chip-icon';
-        iconImg.style.width = '14px';
-        iconImg.style.height = '14px';
-        iconImg.style.flexShrink = '0';
-        iconImg.onerror = function() {
-          this.replaceWith(Object.assign(document.createElement('span'), {
-            className: 'filter-chip-dot',
-            style: 'background-color:' + color
-          }));
-        };
-        chip.appendChild(iconImg);
-      } else {
-        chip.appendChild(el('span', { class: 'filter-chip-dot', style: { backgroundColor: color } }));
-      }
-      chip.appendChild(document.createTextNode(dept));
-      chip.appendChild(el('span', { class: 'filter-chip-count' }, String(count)));
-      chip.addEventListener('click', () => {
+      const item = el('div', {
+        class: 'filter-dropdown-item' + (isActive ? ' active' : '')
+      },
+        el('span', { class: 'filter-check', innerHTML: isActive ? '✓' : '' }),
+        el('span', { class: 'filter-item-dot', style: { backgroundColor: color } }),
+        el('span', { class: 'filter-item-label' }, dept),
+        el('span', { class: 'filter-item-count' }, String(count))
+      );
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
         Store.toggleDepartmentFilter(dept);
         refreshFilters();
         if (OC.ChartView) OC.ChartView.refresh();
       });
-      bar.appendChild(chip);
+      menu.appendChild(item);
     });
 
-    // Status filter group
-    const statusGroup = el('div', { class: 'filter-status-group' });
+    dropdown.appendChild(menu);
+    return dropdown;
+  }
+
+  /* ── Build Status Dropdown ── */
+  function buildStatusDropdown() {
+    const state = Store.getState();
+    const activeStatuses = state.filters.statuses;
+
+    const dropdown = el('div', { class: 'filter-dropdown filter-dropdown-status' });
+
+    const activeCount = activeStatuses.length;
+    const label = activeCount === 0 ? 'All Statuses' : activeStatuses.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ');
+    const toggle = el('button', {
+      class: 'filter-dropdown-toggle' + (activeCount > 0 ? ' has-selection' : ''),
+      type: 'button'
+    },
+      el('span', { class: 'filter-dropdown-icon', innerHTML: Icons.users(14) }),
+      el('span', { class: 'filter-dropdown-label' }, label),
+      el('span', { class: 'filter-dropdown-arrow', innerHTML: '▾' })
+    );
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.filter-dropdown.open').forEach(d => {
+        if (d !== dropdown) d.classList.remove('open');
+      });
+      dropdown.classList.toggle('open');
+    });
+    dropdown.appendChild(toggle);
+
+    const menu = el('div', { class: 'filter-dropdown-menu' });
+
     const statuses = [
       { key: 'vacant', label: 'Vacant', color: 'var(--status-vacant)' },
-      { key: 'interim', label: 'Interim', color: 'var(--status-interim)' }
+      { key: 'interim', label: 'Interim', color: 'var(--status-interim)' },
+      { key: 'filled', label: 'Filled', color: 'var(--status-filled)' }
     ];
+
     statuses.forEach(s => {
       const isActive = activeStatuses.includes(s.key);
-      const chip = el('button', {
-        class: 'filter-chip' + (isActive ? ' active' : ''),
-        style: { '--chip-color': s.color }
+      const item = el('div', {
+        class: 'filter-dropdown-item' + (isActive ? ' active' : '')
       },
-        el('span', { class: 'filter-chip-dot', style: { backgroundColor: s.color } }),
-        s.label
+        el('span', { class: 'filter-check', innerHTML: isActive ? '✓' : '' }),
+        el('span', { class: 'filter-item-dot', style: { backgroundColor: s.color } }),
+        el('span', { class: 'filter-item-label' }, s.label)
       );
-      chip.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
         Store.toggleStatusFilter(s.key);
         refreshFilters();
         if (OC.ChartView) OC.ChartView.refresh();
       });
-      statusGroup.appendChild(chip);
+      menu.appendChild(item);
     });
-    bar.appendChild(statusGroup);
+
+    dropdown.appendChild(menu);
+    return dropdown;
+  }
+
+  /* ── Build Active Filter Tags ── */
+  function buildActiveTags() {
+    const state = Store.getState();
+    const activeDepts = state.filters.departments;
+    const activeStatuses = state.filters.statuses;
+
+    if (activeDepts.length === 0 && activeStatuses.length === 0) return null;
+
+    const tags = el('div', { class: 'filter-active-tags' });
+
+    activeDepts.forEach(dept => {
+      const color = Store.getDeptColor(dept);
+      const tag = el('span', { class: 'filter-tag' },
+        el('span', { class: 'filter-tag-dot', style: { backgroundColor: color } }),
+        dept,
+        el('button', { class: 'filter-tag-remove', innerHTML: '×', title: 'Remove ' + dept })
+      );
+      tag.querySelector('.filter-tag-remove').addEventListener('click', () => {
+        Store.toggleDepartmentFilter(dept);
+        refreshFilters();
+        if (OC.ChartView) OC.ChartView.refresh();
+      });
+      tags.appendChild(tag);
+    });
+
+    activeStatuses.forEach(s => {
+      const colors = { vacant: 'var(--status-vacant)', interim: 'var(--status-interim)', filled: 'var(--status-filled)' };
+      const tag = el('span', { class: 'filter-tag' },
+        el('span', { class: 'filter-tag-dot', style: { backgroundColor: colors[s] } }),
+        s.charAt(0).toUpperCase() + s.slice(1),
+        el('button', { class: 'filter-tag-remove', innerHTML: '×', title: 'Remove ' + s })
+      );
+      tag.querySelector('.filter-tag-remove').addEventListener('click', () => {
+        Store.toggleStatusFilter(s);
+        refreshFilters();
+        if (OC.ChartView) OC.ChartView.refresh();
+      });
+      tags.appendChild(tag);
+    });
+
+    // "Clear All" button
+    const clearBtn = el('button', { class: 'filter-tag filter-tag-clear' }, 'Clear All');
+    clearBtn.addEventListener('click', () => {
+      Store.clearFilters();
+      refreshFilters();
+      if (OC.ChartView) OC.ChartView.refresh();
+    });
+    tags.appendChild(clearBtn);
+
+    return tags;
+  }
+
+  /* ── Render Full Filter Bar ── */
+  function renderFilterBar() {
+    if (!CONFIG.features.departmentFilter) return null;
+
+    const bar = el('div', { class: 'hierarchy-filter-bar' });
+
+    // Dropdowns row
+    const dropdownRow = el('div', { class: 'filter-dropdowns-row' });
+    dropdownRow.appendChild(buildDeptDropdown());
+    dropdownRow.appendChild(buildStatusDropdown());
+    bar.appendChild(dropdownRow);
+
+    // Active tags
+    const tags = buildActiveTags();
+    if (tags) bar.appendChild(tags);
 
     return bar;
   }
@@ -106,11 +233,9 @@ OC.TreeView = (function() {
   }
 
   function render() {
-    // Insert filter chips into the stats bar area
     const statsBar = Utils.$('.stats-bar') || document.getElementById('stats-bar');
     if (!statsBar) return;
 
-    // Create or find the filter container after the stats bar
     filterContainer = Utils.$('.hierarchy-filter-container');
     if (!filterContainer) {
       filterContainer = el('div', { class: 'hierarchy-filter-container', id: 'hierarchy-filters' });
@@ -122,9 +247,12 @@ OC.TreeView = (function() {
     if (filterBar) filterContainer.appendChild(filterBar);
   }
 
+  let outsideClickSetup = false;
+
   return {
     init() {
       render();
+      if (!outsideClickSetup) { setupOutsideClick(); outsideClickSetup = true; }
       Events.on('store:selected', () => {});
       Events.on('store:expandAll', () => {});
       Events.on('store:collapseAll', () => {});
