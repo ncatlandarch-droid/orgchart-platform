@@ -12,6 +12,7 @@ OC.ChartView = (function() {
   let container, canvas, svgLayer;
   let zoom = 0.7;
   let panX = 0, panY = 0;
+  let isAnimating = false;
   let isDragging = false;
   let dragStartX, dragStartY;
   let nodePositions = {};
@@ -239,9 +240,75 @@ OC.ChartView = (function() {
     panY = PAD;
   }
 
-  function applyTransform() {
+  function applyTransform(animate) {
     if (!canvas) return;
+    if (animate) {
+      isAnimating = true;
+      canvas.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      canvas.addEventListener('transitionend', () => {
+        canvas.style.transition = '';
+        isAnimating = false;
+      }, { once: true });
+    } else {
+      canvas.style.transition = '';
+    }
     canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  }
+
+  /* ── Zoom to filtered nodes ── */
+  function zoomToFiltered() {
+    if (!container || !canvas) return;
+    if (!Store.hasActiveFilters()) return; // only zoom when filtering
+
+    const data = Store.getData();
+    if (!data) return;
+
+    // Collect bounding box of all matching nodes
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let matchCount = 0;
+
+    function walkTree(node) {
+      const pos = nodePositions[node.id];
+      if (pos && Store.nodeMatchesFilters(node)) {
+        minX = Math.min(minX, pos.x);
+        minY = Math.min(minY, pos.y);
+        maxX = Math.max(maxX, pos.x + NODE_W);
+        maxY = Math.max(maxY, pos.y + NODE_H);
+        matchCount++;
+      }
+      if (node.children && Store.isExpanded(node.id)) {
+        node.children.forEach(walkTree);
+      }
+    }
+    walkTree(data);
+
+    if (matchCount === 0 || minX === Infinity) return;
+
+    // Add padding around the bounding box
+    const bPad = 60;
+    minX -= bPad;
+    minY -= bPad;
+    maxX += bPad;
+    maxY += bPad;
+
+    // Account for PAD offset in nodePositions
+    const bbW = (maxX - minX) + PAD * 2;
+    const bbH = (maxY - minY) + PAD * 2;
+
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+
+    // Calculate zoom to fit bounding box
+    const zoomW = cw / bbW;
+    const zoomH = ch / bbH;
+    zoom = Math.min(zoomW, zoomH, 1.2) * 0.9;
+
+    // Center the bounding box
+    panX = (cw - bbW * zoom) / 2 - (minX + PAD) * zoom;
+    panY = (ch - bbH * zoom) / 2 - (minY + PAD) * zoom;
+
+    applyTransform(true);
+    updateZoomDisplay();
   }
 
   /* ── Pan & Zoom ────────────────────────── */
@@ -344,7 +411,11 @@ OC.ChartView = (function() {
       Events.on('store:expandAll', renderChart);
       Events.on('store:collapseAll', renderChart);
       Events.on('store:dataChanged', renderChart);
-      Events.on('store:filtersChanged', renderChart);
+      Events.on('store:filtersChanged', () => {
+        renderChart();
+        // Auto-zoom to filtered nodes after render
+        requestAnimationFrame(() => zoomToFiltered());
+      });
 
       // Handle analysis view toggle
       Events.on('store:viewChanged', (view) => {
