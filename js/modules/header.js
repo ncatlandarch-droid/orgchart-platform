@@ -13,28 +13,35 @@ OC.Header = (function() {
     const cfg = CONFIG.organization;
     header.innerHTML = '';
 
-    // Brand — official NC A&T horizontal lockup (A&T mark + full university name)
-    const logoEl = el('div', { class: 'header-logo' });
+    // Brand — AVA-style layout: A&T mark | University Name + Tagline
+    const brandLeft = el('div', { class: 'header-brand' });
+
+    // A&T icon mark (gold/blue on dark header — no filter needed)
     const logoImg = document.createElement('img');
-    logoImg.src = 'assets/ncat-stacked-logo.png';
-    logoImg.alt = 'North Carolina Agricultural and Technical State University';
-    logoImg.className = 'header-logo-lockup';
+    logoImg.src = 'assets/ncat-logo.png';
+    logoImg.alt = 'NC A&T';
+    logoImg.className = 'header-at-logo';
     logoImg.onerror = function() {
-      // Fallback to header logo
-      this.src = 'assets/ncat-header-logo.png';
+      this.src = 'assets/ncat-logo-white.png';
       this.onerror = function() {
-        // Final fallback to text
-        this.parentElement.innerHTML = '<span style="font-weight:900;font-size:14px;color:#FDB927;">' + (cfg.shortName || 'NC A&T') + '</span>';
+        this.parentElement.innerHTML = '<span style="font-weight:900;font-size:22px;color:#FDB927;">A&T</span>';
       };
     };
-    logoEl.appendChild(logoImg);
+    brandLeft.appendChild(logoImg);
 
-    const brand = el('div', { class: 'header-brand' },
-      logoEl,
-      el('div', { class: 'header-titles' },
-        el('div', { class: 'header-tagline' }, cfg.tagline)
-      )
+    // Vertical separator
+    const sep = el('span', { class: 'header-logo-separator' });
+    brandLeft.appendChild(sep);
+
+    // Text block: university name + tagline
+    const textBlock = el('div', { class: 'header-titles' });
+    const orgName = el('div', { class: 'header-org-name' });
+    orgName.innerHTML = 'North Carolina Agricultural<br>and Technical State University';
+    textBlock.appendChild(orgName);
+    textBlock.appendChild(
+      el('div', { class: 'header-tagline' }, cfg.tagline)
     );
+    brandLeft.appendChild(textBlock);
 
     // Search
     const searchWrap = el('div', { class: 'header-search' });
@@ -114,7 +121,7 @@ OC.Header = (function() {
       controls.appendChild(importBtn);
     }
 
-    header.appendChild(brand);
+    header.appendChild(brandLeft);
     header.appendChild(searchWrap);
     header.appendChild(controls);
   }

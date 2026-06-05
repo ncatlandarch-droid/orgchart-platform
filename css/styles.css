@@ -150,17 +150,27 @@ a:hover { text-decoration: underline; }
 /* ── Header ───────────────────────────────── */
 .app-header {
   height: var(--header-height);
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
-  border-bottom: 2px solid;
-  border-image: linear-gradient(90deg, var(--accent), var(--accent-dark), var(--accent)) 1;
+  /* Aggie blue gradient — animated like AVA */
+  background: linear-gradient(135deg, #003087 0%, #002266 40%, #001a4d 70%, #003087 100%);
+  background-size: 300% 300%;
+  animation: headerGradientShift 12s ease-in-out infinite;
+  border-bottom: 3px solid;
+  border-image: linear-gradient(90deg, #FDB927, #E6A521, #FDB927) 1;
+  box-shadow: 0 4px 20px rgba(0,48,135,0.35);
   display: flex;
   align-items: center;
-  padding: 0 var(--gap-lg);
+  padding: 0 20px;
   gap: var(--gap-lg);
   z-index: var(--z-header);
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
+}
+
+@keyframes headerGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .app-header::before {
@@ -176,49 +186,55 @@ a:hover { text-decoration: underline; }
 .header-brand {
   display: flex;
   align-items: center;
-  gap: var(--gap-md);
+  gap: 14px;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
 }
 
-.header-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.header-logo img {
-  height: 42px;
+/* NC A&T icon mark (gold/blue interlocking letters) */
+.header-at-logo {
+  height: 44px;
   width: auto;
-  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+  transition: transform var(--speed-fast);
 }
 
-/* CSS filter to make the blue-text lockup logo appear white on dark header.
-   The gold A&T mark stays vibrant through the brightness + invert combo. */
-.header-logo-lockup {
-  filter: brightness(0) invert(1);
-  transition: filter var(--speed-normal);
+.header-at-logo:hover {
+  transform: scale(1.05);
 }
 
-.header-logo-lockup:hover {
-  filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(253, 185, 39, 0.4));
+/* Vertical separator between logo and text — AVA style */
+.header-logo-separator {
+  width: 1px;
+  height: 34px;
+  background: rgba(255,255,255,0.2);
+  flex-shrink: 0;
 }
 
 .header-titles {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  line-height: 1.15;
+  gap: 2px;
+}
+
+.header-org-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.2px;
+  line-height: 1.25;
 }
 
 .header-tagline {
-  font-size: 11.5px;
+  font-size: 10px;
   font-weight: 500;
-  color: var(--accent);
-  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 1.2px;
   text-transform: uppercase;
+  margin-top: 1px;
 }
 
 /* Header Search */
