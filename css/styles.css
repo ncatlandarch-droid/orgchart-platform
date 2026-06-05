@@ -184,8 +184,8 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--gap-sm) 20px;
-  min-height: 58px;
+  padding: 12px 24px;
+  min-height: 62px;
   position: relative;
   z-index: 1;
 }
@@ -199,7 +199,7 @@ a:hover { text-decoration: underline; }
 
 /* NC A&T white logo (same asset as EMMA) */
 .header-at-logo {
-  height: 40px;
+  height: 44px;
   width: auto;
   flex-shrink: 0;
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
@@ -219,7 +219,7 @@ a:hover { text-decoration: underline; }
 /* Vertical separator between logo and brand */
 .header-logo-separator {
   width: 1px;
-  height: 28px;
+  height: 34px;
   background: rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
 }
@@ -232,7 +232,7 @@ a:hover { text-decoration: underline; }
 }
 
 .header-brand-name {
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 900;
   letter-spacing: 0.01em;
   display: flex;
@@ -249,7 +249,7 @@ a:hover { text-decoration: underline; }
 .header-brand-name .brand-word {
   color: rgba(255, 255, 255, 0.92);
   font-weight: 500;
-  font-size: 26px;
+  font-size: 30px;
 }
 
 .header-brand-tagline {
