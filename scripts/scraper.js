@@ -38,23 +38,21 @@ const CONFIG = {
 };
 
 // —— Configurable CSS Selectors (Primary Source: UNC Salary DB) ——
-// Adjust these after inspecting debug HTML output with --debug flag.
-// Run: node scraper.js --debug
-// Then open ../data/debug-response.html in a browser to see the real structure.
+// These match the actual UNC Salary DB structure discovered via --debug.
+// The DB uses ajax.php with jQuery DataTables paging (pageSize=20).
+// Campus code for NC A&T is "NCA&T" in the multi-select #Campus dropdown.
 const SELECTORS = {
-  // UNC Salary Database selectors
   unc: {
-    resultTable: 'table.results, table.salary-table, table#results, table',
-    tableRow: 'tbody tr, tr',
+    resultTable: 'table.salaryGrid, table#resultsTable, table',
+    tableRow: 'tbody tr',
+    // The accordion-toggle rows contain the summary data
+    // Columns: Name, Working Title, Department, Campus, Snapshot Date, Salary
     nameCell: 'td:nth-child(1)',
     titleCell: 'td:nth-child(2)',
-    salaryCell: 'td:nth-child(3)',
-    departmentCell: 'td:nth-child(4)',
-    // Pagination
-    nextPage: 'a.next, a[rel="next"], .pagination a:last-child',
-    totalResults: '.result-count, .total-results, .showing',
+    departmentCell: 'td:nth-child(3)',
+    campusCell: 'td:nth-child(4)',
+    salaryCell: 'td:nth-child(6)',
   },
-  // Fallback: OpenTheBooks selectors
   openBooks: {
     resultTable: 'table, .search-results',
     tableRow: 'tbody tr, .result-row',
@@ -73,19 +71,10 @@ const DEBUG = args.includes('--debug');
 
 // —— Utility Functions ——
 
-/**
- * Returns a formatted timestamp for logging
- * @returns {string} ISO timestamp prefix
- */
 function timestamp() {
   return `[${new Date().toISOString()}]`;
 }
 
-/**
- * Logs a message with timestamp prefix
- * @param {string} msg - Message to log
- * @param {'info'|'warn'|'error'|'success'} level - Log level
- */
 function log(msg, level = 'info') {
   const prefix = {
     info: '\x1b[36mℹ\x1b[0m',
@@ -96,20 +85,10 @@ function log(msg, level = 'info') {
   console.log(`${timestamp()} ${prefix[level] || '•'} ${msg}`);
 }
 
-/**
- * Delays execution for specified milliseconds
- * @param {number} ms - Milliseconds to sleep
- * @returns {Promise<void>}
- */
 function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
-/**
- * Parses a salary string into a number
- * @param {string} raw - Raw salary string (e.g. "$85,000.00")
- * @returns {number|null} Parsed salary or null
- */
 function parseSalary(raw) {
   if (!raw) return null;
   const cleaned = raw.replace(/[^\d.]/g, '');
@@ -117,19 +96,11 @@ function parseSalary(raw) {
   return isNaN(num) ? null : num;
 }
 
-/**
- * Cleans whitespace and trims a string
- * @param {string} raw - Raw text
- * @returns {string} Cleaned text
- */
 function cleanText(raw) {
   if (!raw) return '';
   return raw.replace(/\s+/g, ' ').trim();
 }
 
-/**
- * Ensures the data output directory exists
- */
 function ensureDataDir() {
   if (!existsSync(CONFIG.dataDir)) {
     mkdirSync(CONFIG.dataDir, { recursive: true });
@@ -137,14 +108,6 @@ function ensureDataDir() {
   }
 }
 
-/**
- * Fetches a URL with retry logic and rate limiting.
- * Uses exponential backoff between retries.
- * @param {string} url - URL to fetch
- * @param {RequestInit} [options={}] - Fetch options
- * @param {number} [attempt=1] - Current attempt number
- * @returns {Promise<Response>} Fetch response
- */
 async function fetchWithRetry(url, options = {}, attempt = 1) {
   try {
     const response = await fetch(url, {
@@ -176,41 +139,27 @@ async function fetchWithRetry(url, options = {}, attempt = 1) {
 
 /**
  * Accepts the terms of use on the UNC salary database.
- * POSTs the agreement form and returns cookies for subsequent requests.
- * @returns {Promise<string|null>} Session cookie string or null on failure
+ * @returns {Promise<string|null>} Session cookie string or null
  */
 async function acceptUNCTerms() {
   log('Accepting UNC Salary Database terms of use...', 'info');
-
   try {
     const response = await fetchWithRetry(
       'https://uncdm.northcarolina.edu/salaries/index.php',
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'action=agree',
         redirect: 'manual',
       }
     );
-
-    // Extract session cookies from Set-Cookie headers
     const cookies = response.headers.getSetCookie?.() || [];
     const cookieStr = cookies.map(c => c.split(';')[0]).join('; ');
-
     if (cookieStr) {
       log('Session cookie obtained successfully', 'success');
     } else {
       log('No session cookie received — proceeding anyway', 'warn');
     }
-
-    // If we got a redirect, follow it manually with cookies
-    if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.get('location');
-      log(`Redirected to: ${location}`, 'info');
-    }
-
     return cookieStr || '';
   } catch (err) {
     log(`Failed to accept terms: ${err.message}`, 'error');
@@ -219,38 +168,51 @@ async function acceptUNCTerms() {
 }
 
 /**
- * Searches the UNC salary database for the configured institution.
- * @param {string} cookies - Session cookies from acceptUNCTerms()
- * @param {number} [page=1] - Page number to fetch
+ * Searches the UNC salary database via ajax.php endpoint.
+ * The form uses: Campus[]=NCA&T, with pagination via gaPaging plugin (pageSize=20).
+ * @param {string} cookies - Session cookies
+ * @param {number} [page=1] - Page number (1-based)
  * @returns {Promise<{html: string, status: number}>}
  */
 async function searchUNCSalaryDB(cookies, page = 1) {
-  log(`Searching UNC Salary DB for "${CONFIG.institution}" (page ${page})...`, 'info');
+  log(`Querying UNC Salary DB ajax.php for NCA&T (page ${page})...`, 'info');
 
-  // Build search parameters — the exact params may need adjusting
-  // after inspecting the form with --debug
-  const params = new URLSearchParams({
-    action: 'search',
-    institution: CONFIG.institution,
-    name: '',
-    page: page.toString(),
-  });
+  // Parameters discovered from script.min.js analysis:
+  // The searchButton click handler builds: {type:"json"} then adds form fields via:
+  //   campus: $("#Campus").val()     → multi-select, value = ["NCA&T"]
+  //   department: $("#Department").val()
+  //   first: $("#fName").val()
+  //   last: $("#lName").val()  
+  //   position: $("#Position").val()
+  //   salary: $("#Salary").val()
+  // Then gaPaging sends it to ajax.php with page/pageSize
+  const body = new URLSearchParams();
+  body.append('type', 'json');
+  body.append('campus', 'NCA&T');
+  body.append('department', '');
+  body.append('first', '');
+  body.append('last', '');
+  body.append('position', '');
+  body.append('salary', '');
+  body.append('page', page.toString());
+  body.append('pageSize', '500');
 
   try {
     const response = await fetchWithRetry(
-      'https://uncdm.northcarolina.edu/salaries/index.php',
+      'https://uncdm.northcarolina.edu/salaries/ajax.php',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Cookie': cookies,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Referer': 'https://uncdm.northcarolina.edu/salaries/index.php',
         },
-        body: params.toString(),
+        body: body.toString(),
       }
     );
-
-    const html = await response.text();
-    return { html, status: response.status };
+    const text = await response.text();
+    return { html: text, status: response.status };
   } catch (err) {
     log(`Search failed: ${err.message}`, 'error');
     return { html: '', status: 0 };
@@ -258,63 +220,71 @@ async function searchUNCSalaryDB(cookies, page = 1) {
 }
 
 /**
- * Parses employee data from UNC salary DB HTML.
- * NOTE: Selectors are configurable — run with --debug first to
- * inspect the actual page structure, then update SELECTORS.unc.
- * @param {string} html - Raw HTML response
- * @returns {Array<{name: string, title: string, salary: number|null, department: string}>}
+ * Parses employee data from UNC salary DB AJAX JSON response.
+ * Actual format: { totalRecords: N, names: [colNames], data: [[row], [row], ...] }
+ * Column order: campus, first, last, department, position, salary
+ * @param {string} responseText - Raw JSON response from ajax.php
+ * @returns {{ employees: Array, totalRecords: number }}
  */
-function parseUNCResults(html) {
-  const $ = load(html);
+function parseUNCResults(responseText) {
   const employees = [];
-  const sel = SELECTORS.unc;
 
-  // Try to find the results table
-  const table = $(sel.resultTable).first();
-  if (!table.length) {
-    log('No results table found in UNC response', 'warn');
-    return employees;
-  }
+  try {
+    const json = JSON.parse(responseText);
 
-  // Parse each row
-  $(sel.tableRow, table).each((i, row) => {
-    const $row = $(row);
+    // Actual UNC salary DB format: { totalRecords, names, data }
+    if (json.totalRecords !== undefined && json.names && json.data) {
+      // Build column index map from names array
+      const cols = {};
+      json.names.forEach((name, i) => { cols[name.toLowerCase()] = i; });
 
-    // Skip header rows
-    if ($row.find('th').length > 0) return;
+      const iCampus = cols['campus'] ?? 0;
+      const iFirst = cols['first'] ?? 1;
+      const iLast = cols['last'] ?? 2;
+      const iDept = cols['department'] ?? 3;
+      const iPosition = cols['position'] ?? 4;
+      const iSalary = cols['salary'] ?? 5;
 
-    const name = cleanText($row.find(sel.nameCell).text());
-    const title = cleanText($row.find(sel.titleCell).text());
-    const salaryRaw = cleanText($row.find(sel.salaryCell).text());
-    const department = cleanText($row.find(sel.departmentCell).text());
+      json.data.forEach(row => {
+        if (!Array.isArray(row)) return;
 
-    // Only add if we have at least a name
-    if (name && name.toLowerCase() !== 'name') {
-      employees.push({
-        name,
-        title,
-        salary: parseSalary(salaryRaw),
-        department: department || null,
+        const first = cleanText(row[iFirst] || '');
+        const last = cleanText(row[iLast] || '');
+        const name = `${first} ${last}`.trim();
+        const department = cleanText(row[iDept] || '');
+        const title = cleanText(row[iPosition] || '');
+        const salary = parseSalary(String(row[iSalary] || ''));
+
+        if (name && name.length > 1) {
+          employees.push({ name, title, salary, department: department || null });
+        }
+      });
+
+      return { employees, totalRecords: json.totalRecords };
+    }
+
+    // Fallback: plain array of objects
+    if (Array.isArray(json)) {
+      json.forEach(item => {
+        const name = cleanText(
+          (item.first || item.fName || '') + ' ' + (item.last || item.lName || item.name || '')
+        ).trim();
+        const title = cleanText(item.position || item.title || '');
+        const department = cleanText(item.department || '');
+        const salary = parseSalary(String(item.salary || ''));
+        if (name) employees.push({ name, title, salary, department: department || null });
       });
     }
-  });
+  } catch {
+    log('Response is not valid JSON — cannot parse', 'warn');
+  }
 
-  return employees;
+  return { employees, totalRecords: employees.length };
 }
 
 /**
- * Checks if there's a next page in the UNC results
- * @param {string} html - Current page HTML
- * @returns {boolean} True if more pages exist
- */
-function hasNextPageUNC(html) {
-  const $ = load(html);
-  return $(SELECTORS.unc.nextPage).length > 0;
-}
-
-/**
- * Full scrape of UNC Salary Database with pagination.
- * Handles session management, searching, and page iteration.
+ * Full scrape of UNC Salary Database via ajax.php (type=json).
+ * Paginates through all results using pageSize=500.
  * @returns {Promise<Array>} All employees found
  */
 async function scrapeUNCSalaryDB() {
@@ -330,12 +300,12 @@ async function scrapeUNCSalaryDB() {
 
   let allEmployees = [];
   let page = 1;
-  let hasMore = true;
+  let totalRecords = 0;
+  const maxPages = 20;
 
-  while (hasMore) {
+  while (page <= maxPages) {
     const { html, status } = await searchUNCSalaryDB(cookies, page);
 
-    // Save debug HTML on first page
     if (DEBUG && page === 1) {
       ensureDataDir();
       writeFileSync(CONFIG.debugPath, html, 'utf-8');
@@ -347,24 +317,36 @@ async function scrapeUNCSalaryDB() {
       break;
     }
 
-    const pageEmployees = parseUNCResults(html);
-    log(`Page ${page}: found ${pageEmployees.length} employees`, 'info');
+    const result = parseUNCResults(html);
+    if (page === 1) totalRecords = result.totalRecords;
+    log(`Page ${page}: found ${result.employees.length} employees (${allEmployees.length + result.employees.length}/${totalRecords} total)`, 'info');
 
-    if (pageEmployees.length === 0) {
-      log('No employees found on this page — stopping', 'info');
+    if (result.employees.length === 0) {
+      log('No more results — pagination complete', 'info');
       break;
     }
 
-    allEmployees = allEmployees.concat(pageEmployees);
-    hasMore = hasNextPageUNC(html);
-    page++;
+    allEmployees = allEmployees.concat(result.employees);
 
-    if (hasMore) {
-      await sleep(CONFIG.rateLimitMs);
+    // If we have all records or got fewer than pageSize, we're done
+    if (allEmployees.length >= totalRecords) {
+      break;
     }
+
+    page++;
+    await sleep(CONFIG.rateLimitMs);
   }
 
-  log(`UNC DB total: ${allEmployees.length} employees across ${page} page(s)`, 'success');
+  // Deduplicate by normalized name
+  const seen = new Set();
+  allEmployees = allEmployees.filter(emp => {
+    const key = emp.name.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  log(`UNC DB total: ${allEmployees.length} unique employees (API reported ${totalRecords}) across ${page} page(s)`, 'success');
   return allEmployees;
 }
 
