@@ -1,0 +1,16 @@
+{
+  "name": "orgchart-pipeline",
+  "version": "1.0.0",
+  "description": "Automated NC A&T org chart data pipeline",
+  "type": "module",
+  "scripts": {
+    "scrape": "node scraper.js",
+    "scrape:directory": "node directory-scraper.js",
+    "map": "node mapper.js",
+    "pipeline": "node scraper.js && node directory-scraper.js && node mapper.js",
+    "dry-run": "node scraper.js --dry-run"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}

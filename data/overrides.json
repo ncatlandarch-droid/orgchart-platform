@@ -1,0 +1,28 @@
+{
+  "_comment": "Manual overrides for the automated org chart pipeline. Edit this file to customize hierarchy, add photos, or exclude employees.",
+  "version": "1.0.0",
+  "lastUpdated": "2026-06-06",
+  
+  "hierarchy_overrides": {
+    "W. Chris Harrison": {
+      "parent": "caes-nred",
+      "title_override": "Assistant Professor & BSLA Program Coordinator",
+      "directReports": 2
+    },
+    "Dallas Bretzman": {
+      "parent": "caes-nred"
+    }
+  },
+  
+  "exclusions": [],
+  
+  "photo_urls": {},
+  
+  "since_dates": {
+    "Harold L. Martin, Sr.": "2009",
+    "W. Chris Harrison": "2020",
+    "Dallas Bretzman": "2024"
+  },
+  
+  "custom_metadata": {}
+}

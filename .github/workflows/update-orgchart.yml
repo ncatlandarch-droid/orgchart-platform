@@ -1,0 +1,86 @@
+name: Update Org Chart Data
+
+on:
+  schedule:
+    # Run quarterly: 6am UTC on the 1st of Jan, Apr, Jul, Oct
+    - cron: '0 6 1 1,4,7,10 *'
+  workflow_dispatch:
+    inputs:
+      apply_changes:
+        description: 'Auto-apply changes to data.js (skip PR review)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd scripts && npm install
+
+      - name: Run salary scraper
+        run: cd scripts && node scraper.js
+        continue-on-error: true
+
+      - name: Run directory scraper  
+        run: cd scripts && node directory-scraper.js
+        continue-on-error: true
+
+      - name: Run mapper (hybrid mode)
+        run: cd scripts && node mapper.js
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -f "data/pipeline-report.json" ]; then
+            NEW_COUNT=$(cat data/pipeline-report.json | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('new_hires', [])))")
+            DEPARTED=$(cat data/pipeline-report.json | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('potential_departures', [])))")
+            SALARY=$(cat data/pipeline-report.json | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('salary_changes', [])))")
+            echo "new=$NEW_COUNT" >> $GITHUB_OUTPUT
+            echo "departed=$DEPARTED" >> $GITHUB_OUTPUT  
+            echo "salary=$SALARY" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Apply changes (if requested)
+        if: steps.changes.outputs.has_changes == 'true' && github.event.inputs.apply_changes == 'true'
+        run: cd scripts && node mapper.js --apply
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true' && github.event.inputs.apply_changes != 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🔄 Quarterly org chart update"
+          title: "🔄 Org Chart Update: ${{ steps.changes.outputs.new }} new, ${{ steps.changes.outputs.departed }} departed, ${{ steps.changes.outputs.salary }} salary changes"
+          body: |
+            ## Automated Org Chart Update
+            
+            **Source**: UNC Salary Information Database (quarterly snapshot)
+            
+            ### Changes Detected
+            - 🆕 **New Hires**: ${{ steps.changes.outputs.new }}
+            - 👋 **Potential Departures**: ${{ steps.changes.outputs.departed }}
+            - 💰 **Salary Updates**: ${{ steps.changes.outputs.salary }}
+            
+            ### Review
+            - Check `data/pipeline-report.json` for full details
+            - Check `data/pending-additions.js` for new nodes to merge
+            - Approve and merge to deploy
+          branch: auto/orgchart-update
+          labels: automated,org-chart
