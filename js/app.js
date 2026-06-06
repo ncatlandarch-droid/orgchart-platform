@@ -29,14 +29,14 @@ OC.App = (function() {
     if (CONFIG.features.importExport) ImportExport.init();
     if (CONFIG.features.analysis) Analysis.init();
 
-    // 4. Hide loading screen
+    // 4. Hide loading screen (fast — data is local)
     setTimeout(() => {
       const loading = Utils.$('.loading-screen');
       if (loading) {
         loading.classList.add('fade-out');
-        setTimeout(() => loading.remove(), 600);
+        setTimeout(() => loading.remove(), 400);
       }
-    }, 800);
+    }, 200);
 
     // 5. Handle window resize
     let resizeTimer;

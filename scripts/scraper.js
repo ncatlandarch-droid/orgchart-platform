@@ -174,24 +174,16 @@ async function acceptUNCTerms() {
  * @param {number} [page=1] - Page number (1-based)
  * @returns {Promise<{html: string, status: number}>}
  */
-async function searchUNCSalaryDB(cookies, page = 1) {
-  log(`Querying UNC Salary DB ajax.php for NCA&T (page ${page})...`, 'info');
+async function searchUNCSalaryDB(cookies, page = 1, lastNameFilter = '') {
+  const filterLabel = lastNameFilter ? ` [last="${lastNameFilter}"]` : '';
+  log(`Querying UNC Salary DB ajax.php for NCA&T${filterLabel} (page ${page})...`, 'info');
 
-  // Parameters discovered from script.min.js analysis:
-  // The searchButton click handler builds: {type:"json"} then adds form fields via:
-  //   campus: $("#Campus").val()     → multi-select, value = ["NCA&T"]
-  //   department: $("#Department").val()
-  //   first: $("#fName").val()
-  //   last: $("#lName").val()  
-  //   position: $("#Position").val()
-  //   salary: $("#Salary").val()
-  // Then gaPaging sends it to ajax.php with page/pageSize
   const body = new URLSearchParams();
   body.append('type', 'json');
   body.append('campus', 'NCA&T');
   body.append('department', '');
   body.append('first', '');
-  body.append('last', '');
+  body.append('last', lastNameFilter);
   body.append('position', '');
   body.append('salary', '');
   body.append('page', page.toString());
@@ -222,53 +214,38 @@ async function searchUNCSalaryDB(cookies, page = 1) {
 /**
  * Parses employee data from UNC salary DB AJAX JSON response.
  * Actual format: { totalRecords: N, names: [colNames], data: [[row], [row], ...] }
- * Column order: campus, first, last, department, position, salary
  * @param {string} responseText - Raw JSON response from ajax.php
  * @returns {{ employees: Array, totalRecords: number }}
  */
 function parseUNCResults(responseText) {
   const employees = [];
-
   try {
     const json = JSON.parse(responseText);
-
-    // Actual UNC salary DB format: { totalRecords, names, data }
     if (json.totalRecords !== undefined && json.names && json.data) {
-      // Build column index map from names array
       const cols = {};
       json.names.forEach((name, i) => { cols[name.toLowerCase()] = i; });
-
-      const iCampus = cols['campus'] ?? 0;
       const iFirst = cols['first'] ?? 1;
       const iLast = cols['last'] ?? 2;
       const iDept = cols['department'] ?? 3;
       const iPosition = cols['position'] ?? 4;
       const iSalary = cols['salary'] ?? 5;
-
       json.data.forEach(row => {
         if (!Array.isArray(row)) return;
-
         const first = cleanText(row[iFirst] || '');
         const last = cleanText(row[iLast] || '');
         const name = `${first} ${last}`.trim();
         const department = cleanText(row[iDept] || '');
         const title = cleanText(row[iPosition] || '');
         const salary = parseSalary(String(row[iSalary] || ''));
-
         if (name && name.length > 1) {
           employees.push({ name, title, salary, department: department || null });
         }
       });
-
       return { employees, totalRecords: json.totalRecords };
     }
-
-    // Fallback: plain array of objects
     if (Array.isArray(json)) {
       json.forEach(item => {
-        const name = cleanText(
-          (item.first || item.fName || '') + ' ' + (item.last || item.lName || item.name || '')
-        ).trim();
+        const name = cleanText((item.first || '') + ' ' + (item.last || item.name || '')).trim();
         const title = cleanText(item.position || item.title || '');
         const department = cleanText(item.department || '');
         const salary = parseSalary(String(item.salary || ''));
@@ -278,13 +255,56 @@ function parseUNCResults(responseText) {
   } catch {
     log('Response is not valid JSON — cannot parse', 'warn');
   }
-
   return { employees, totalRecords: employees.length };
 }
 
 /**
- * Full scrape of UNC Salary Database via ajax.php (type=json).
- * Paginates through all results using pageSize=500.
+ * Fetches all employees for a given last-name filter (or all if empty).
+ * Paginates through all pages for the query.
+ * @param {string} cookies - Session cookies
+ * @param {string} [lastNameFilter=''] - Filter by last name starting with
+ * @returns {Promise<Array>} Employees found
+ */
+async function fetchAllPages(cookies, lastNameFilter = '') {
+  let employees = [];
+  let page = 1;
+  let totalRecords = 0;
+  const maxPages = 20;
+
+  while (page <= maxPages) {
+    const { html, status } = await searchUNCSalaryDB(cookies, page, lastNameFilter);
+
+    if (DEBUG && page === 1 && !lastNameFilter) {
+      ensureDataDir();
+      writeFileSync(CONFIG.debugPath, html, 'utf-8');
+      log(`Debug HTML saved to: ${CONFIG.debugPath}`, 'info');
+    }
+
+    if (status === 0 || !html) break;
+
+    const result = parseUNCResults(html);
+    if (page === 1) totalRecords = result.totalRecords;
+
+    if (result.employees.length === 0) break;
+
+    employees = employees.concat(result.employees);
+
+    // If we got all results or fewer than a full page, done
+    if (employees.length >= totalRecords || result.employees.length < 500) break;
+
+    page++;
+    await sleep(CONFIG.rateLimitMs);
+  }
+
+  return { employees, totalRecords };
+}
+
+/**
+ * Full comprehensive scrape of UNC Salary Database.
+ * Strategy: 
+ *   1. Try fetching all employees in one query
+ *   2. If server caps results (returns fewer than totalRecords),
+ *      switch to letter-by-letter mode (A-Z) to capture everyone
  * @returns {Promise<Array>} All employees found
  */
 async function scrapeUNCSalaryDB() {
@@ -298,43 +318,32 @@ async function scrapeUNCSalaryDB() {
 
   await sleep(CONFIG.rateLimitMs);
 
-  let allEmployees = [];
-  let page = 1;
-  let totalRecords = 0;
-  const maxPages = 20;
+  // Step 1: Try broad query first
+  const initial = await fetchAllPages(cookies);
+  log(`Broad query: ${initial.employees.length} employees (server reports ${initial.totalRecords})`, 'info');
 
-  while (page <= maxPages) {
-    const { html, status } = await searchUNCSalaryDB(cookies, page);
+  let allEmployees = initial.employees;
 
-    if (DEBUG && page === 1) {
-      ensureDataDir();
-      writeFileSync(CONFIG.debugPath, html, 'utf-8');
-      log(`Debug HTML saved to: ${CONFIG.debugPath}`, 'info');
+  // Step 2: If we got fewer than totalRecords, the server capped results.
+  // Switch to letter-by-letter comprehensive mode.
+  if (allEmployees.length < initial.totalRecords * 0.95) {
+    log(`Server capped at ${allEmployees.length}/${initial.totalRecords} — augmenting with letter-by-letter mode...`, 'warn');
+    
+    // MERGE: keep broad results and add letter-by-letter on top (dedup handles overlap)
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    let letterTotal = 0;
+    
+    for (const letter of alphabet) {
+      const result = await fetchAllPages(cookies, letter);
+      if (result.employees.length > 0) {
+        log(`  Letter ${letter}: ${result.employees.length} employees`, 'info');
+        allEmployees = allEmployees.concat(result.employees);
+        letterTotal += result.employees.length;
+      }
+      await sleep(CONFIG.rateLimitMs);
     }
-
-    if (status === 0 || !html) {
-      log('Empty response — stopping pagination', 'warn');
-      break;
-    }
-
-    const result = parseUNCResults(html);
-    if (page === 1) totalRecords = result.totalRecords;
-    log(`Page ${page}: found ${result.employees.length} employees (${allEmployees.length + result.employees.length}/${totalRecords} total)`, 'info');
-
-    if (result.employees.length === 0) {
-      log('No more results — pagination complete', 'info');
-      break;
-    }
-
-    allEmployees = allEmployees.concat(result.employees);
-
-    // If we have all records or got fewer than pageSize, we're done
-    if (allEmployees.length >= totalRecords) {
-      break;
-    }
-
-    page++;
-    await sleep(CONFIG.rateLimitMs);
+    
+    log(`Letter-by-letter added ${letterTotal} raw results (will dedup with broad query)`, 'success');
   }
 
   // Deduplicate by normalized name
@@ -346,7 +355,7 @@ async function scrapeUNCSalaryDB() {
     return true;
   });
 
-  log(`UNC DB total: ${allEmployees.length} unique employees (API reported ${totalRecords}) across ${page} page(s)`, 'success');
+  log(`UNC DB total: ${allEmployees.length} unique employees (API reported ${initial.totalRecords})`, 'success');
   return allEmployees;
 }
 

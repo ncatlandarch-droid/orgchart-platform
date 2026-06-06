@@ -17,6 +17,21 @@ OC.Header = (function() {
     /* ── Top row: logo + brand + search + controls ── */
     const topRow = el('div', { class: 'header-top-row' });
 
+    // Mobile hamburger menu
+    const hamburger = el('button', {
+      class: 'mobile-menu-btn',
+      id: 'mobile-menu-btn',
+      innerHTML: '☰',
+      title: 'Menu'
+    });
+    hamburger.addEventListener('click', () => {
+      const sidebar = Utils.$('.left-panel') || Utils.$('.sidebar');
+      const overlay = Utils.$('.mobile-overlay');
+      if (sidebar) sidebar.classList.toggle('mobile-open');
+      if (overlay) overlay.classList.toggle('active');
+    });
+    topRow.appendChild(hamburger);
+
     /* ── Left: Logo + Brand ── */
     const headerLeft = el('div', { class: 'header-left' });
 
@@ -114,6 +129,38 @@ OC.Header = (function() {
         adminBtn.classList.toggle('active', newState);
       });
       headerRight.appendChild(adminBtn);
+    }
+
+    // Dark mode toggle
+    if (CONFIG.features.darkModeToggle) {
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      const themeBtn = el('button', {
+        class: 'header-control-btn theme-toggle-btn',
+        id: 'theme-toggle-btn',
+        innerHTML: `<span class="toggle-icon">${isDark ? '☀️' : '🌙'}</span> <span class="control-label">${isDark ? 'Light' : 'Dark'}</span>`
+      });
+      themeBtn.addEventListener('click', () => {
+        const isCurrentlyDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        document.documentElement.setAttribute('data-theme', isCurrentlyDark ? 'light' : 'dark');
+        themeBtn.innerHTML = `<span class="toggle-icon">${isCurrentlyDark ? '🌙' : '☀️'}</span> <span class="control-label">${isCurrentlyDark ? 'Dark' : 'Light'}</span>`;
+        // Update CSS variables for light mode
+        if (isCurrentlyDark) {
+          document.documentElement.style.setProperty('--surface-base', '#f0f4f8');
+          document.documentElement.style.setProperty('--surface-elevated', '#ffffff');
+          document.documentElement.style.setProperty('--surface-card', '#ffffff');
+          document.documentElement.style.setProperty('--text-primary', '#1a1a2e');
+          document.documentElement.style.setProperty('--text-secondary', '#4a5568');
+          document.documentElement.style.setProperty('--border', 'rgba(0, 70, 132, 0.12)');
+        } else {
+          document.documentElement.style.setProperty('--surface-base', CONFIG.theme.surfaceBase);
+          document.documentElement.style.setProperty('--surface-elevated', CONFIG.theme.surfaceElevated);
+          document.documentElement.style.setProperty('--surface-card', CONFIG.theme.surfaceCard);
+          document.documentElement.style.setProperty('--text-primary', CONFIG.theme.textPrimary);
+          document.documentElement.style.setProperty('--text-secondary', CONFIG.theme.textSecondary);
+          document.documentElement.style.setProperty('--border', CONFIG.theme.borderColor);
+        }
+      });
+      headerRight.appendChild(themeBtn);
     }
 
     // Export / Import

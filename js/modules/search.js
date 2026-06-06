@@ -127,12 +127,14 @@ OC.Search = (function() {
       titleEl.innerHTML = highlightMatch(node.title, query);
       info.appendChild(titleEl);
 
-      // Meta info
+      // Meta info — also highlight matches in holder name & department
+      const metaEl = el('div', { class: 'search-result-meta' });
       const metaParts = [];
-      if (node.holder && node.holder.name) metaParts.push(node.holder.name);
-      if (node.department) metaParts.push(node.department);
+      if (node.holder && node.holder.name) metaParts.push(highlightMatch(node.holder.name, query));
+      if (node.department) metaParts.push(highlightMatch(node.department, query));
       if (node.division) metaParts.push(node.division);
-      info.appendChild(el('div', { class: 'search-result-meta' }, metaParts.join(' · ')));
+      metaEl.innerHTML = metaParts.join(' · ');
+      info.appendChild(metaEl);
 
       item.appendChild(info);
 
@@ -169,11 +171,18 @@ OC.Search = (function() {
   }
 
   function selectResult(id) {
-    Store.select(id);
+    // 1. Expand the path first so the node is visible in the chart
     Store.expandToNode(id);
+    // 2. Then select — fires store:selected which renders + zooms to node
+    Store.select(id);
     close();
     OC.TreeView.refresh();
-    OC.ChartView.refresh();
+    // 3. Extra zoom call after render settles (safety net)
+    requestAnimationFrame(() => {
+      if (OC.ChartView.zoomToNode) {
+        OC.ChartView.zoomToNode(id, 0.85, true);
+      }
+    });
     OC.PositionCard.refresh();
   }
 

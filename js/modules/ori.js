@@ -645,6 +645,58 @@ OC.ORI = (function() {
 
     panelEl.appendChild(chatSection);
 
+    // ── Tree Navigation Panel (collapsible) ──
+    const treeNavSection = el('div', { class: 'ori-tree-nav-section' });
+    const treeNavToggle = el('button', { class: 'ori-tree-nav-toggle' });
+    treeNavToggle.innerHTML = Icons.network(14) + ' <span>Org Navigator</span> <span class="ori-tree-nav-arrow">▾</span>';
+    let treeNavOpen = false;
+    const treeNavList = el('div', { class: 'ori-tree-nav-list', style: { display: 'none' } });
+
+    function buildTreeNav() {
+      treeNavList.innerHTML = '';
+      const data = Store.getData();
+      if (!data) return;
+
+      // Root node
+      const rootItem = el('button', { class: 'ori-tree-nav-item root' });
+      rootItem.textContent = data.title;
+      rootItem.addEventListener('click', () => navigateToNode(data.id));
+      treeNavList.appendChild(rootItem);
+
+      // Top-level children (divisions)
+      if (data.children) {
+        data.children.forEach(div => {
+          const divColor = Store.getDeptColor(div.department || div.division || div.title);
+          const divItem = el('button', { class: 'ori-tree-nav-item division' });
+          divItem.innerHTML = '<span class="ori-tree-nav-dot" style="background:' + divColor + '"></span> ' + div.title;
+          divItem.addEventListener('click', () => navigateToNode(div.id));
+          treeNavList.appendChild(divItem);
+
+          // Sub-children (colleges/units)
+          if (div.children) {
+            div.children.forEach(sub => {
+              const subItem = el('button', { class: 'ori-tree-nav-item sub' });
+              const subColor = Store.getDeptColor(sub.department || sub.division || '');
+              subItem.innerHTML = '<span class="ori-tree-nav-dot" style="background:' + subColor + '"></span> ' + sub.title;
+              subItem.addEventListener('click', () => navigateToNode(sub.id));
+              treeNavList.appendChild(subItem);
+            });
+          }
+        });
+      }
+    }
+
+    treeNavToggle.addEventListener('click', () => {
+      treeNavOpen = !treeNavOpen;
+      treeNavList.style.display = treeNavOpen ? 'block' : 'none';
+      treeNavToggle.querySelector('.ori-tree-nav-arrow').textContent = treeNavOpen ? '▴' : '▾';
+      if (treeNavOpen) buildTreeNav();
+    });
+
+    treeNavSection.appendChild(treeNavToggle);
+    treeNavSection.appendChild(treeNavList);
+    panelEl.appendChild(treeNavSection);
+
     // INSERT at TOP of sidebar (before tree view) — like EMMA
     sidebar.prepend(panelEl);
   }

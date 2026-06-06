@@ -119,7 +119,7 @@ OC.ImportExport = (function() {
       el('div', { class: 'drop-zone-hint' }, 'Accepts .json files exported from OrgChart Platform')
     );
 
-    const fileInput = el('input', { type: 'file', accept: '.json,.csv', style: { display: 'none' } });
+    const fileInput = el('input', { type: 'file', accept: '.json', style: { display: 'none' } });
     body.appendChild(fileInput);
 
     dropZone.addEventListener('click', () => fileInput.click());

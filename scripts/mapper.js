@@ -51,8 +51,10 @@ const VALIDATE = args.includes('--validate');
 // to parent node IDs in data.js.
 
 const DEPARTMENT_MAP = {
+  // ── Academic Departments ──
   'Biology': 'cost-bio',
   'Chemistry': 'cost-chem',
+  'Mathematics': 'cost-math',
   'Mathematics & Statistics': 'cost-math',
   'Physics': 'cost-phys',
   'Computer Science': 'coe-cs',
@@ -60,49 +62,105 @@ const DEPARTMENT_MAP = {
   'Mechanical Engineering': 'coe-meen',
   'Industrial & Systems Engineering': 'coe-ise',
   'Natural Resources & Environmental Design': 'caes-nred',
+  'Natural Resources & Environ Design': 'caes-nred',
   'Animal Sciences': 'caes-ansc',
   'Family & Consumer Sciences': 'caes-fcs',
+  'Family and Consumer Sciences': 'caes-fcs',
   'Agribusiness, Applied Economics & Agriscience Education': 'caes-abaee',
+  'Agribusiness Econ Agriscience': 'caes-abaee',
   'English': 'cahss-eng',
   'History & Political Science': 'cahss-hps',
+  'History and Political Science': 'cahss-hps',
   'Journalism & Mass Communication': 'cahss-jmc',
+  'Journalism and Mass Comm': 'cahss-jmc',
   'Liberal Studies': 'cahss-ls',
+  'Liberal Studies Department': 'cahss-ls',
   'Visual & Performing Arts': 'cahss-vpa',
+  'Visual and Performing Arts': 'cahss-vpa',
   'Criminal Justice': 'cahss-cj',
   'Psychology': 'chhs-psych',
   'Social Work & Sociology': 'chhs-swas',
+  'Sociology & Social Work': 'chhs-swas',
   'Nursing': 'chhs-nurs',
+  'School of Nursing': 'chhs-nurs',
   'Kinesiology': 'chhs-kin',
   'Communication Sciences & Disorders': 'chhs-csd',
   'Physician Assistant Studies': 'chhs-pa',
+  'Physician Assistant Program': 'chhs-pa',
   'Population Health Management & Policy': 'chhs-phmp',
   'Accounting & Finance': 'cobe-af',
+  'Accounting and Finance': 'cobe-af',
   'Marketing & Supply Chain Management': 'cobe-mscm',
   'Economics': 'cobe-econ',
   'Business Information Systems & Analytics': 'cobe-bisa',
+  'Business Info Systems & Analytics': 'cobe-bisa',
   'Management': 'cobe-mgmt',
   'Educator Preparation': 'coed-ep',
   'Counseling': 'coed-coun',
   'Leadership Studies & Adult Education': 'coed-lsae',
+  'Leadership Studies & Adult Ed': 'coed-lsae',
   'Nanoscience': 'jsnn-nano',
   'Nanoengineering': 'jsnn-nanoeng',
+  'JSNN: Nanoengineering': 'jsnn-nanoeng',
   'Applied Engineering Technology': 'cost-aet',
   'Built Environment': 'cost-be',
+  'Department of Built Environment': 'cost-be',
   'Computer Systems Technology': 'cost-cst',
   'Chemical, Biological & Bio Engineering': 'coe-cbbe',
+  'Chemical Biological & Bioengineerin': 'coe-cbbe',
   'Civil, Architectural & Environmental Engineering': 'coe-caee',
+  'Civil Architect & Environ Engineer': 'coe-caee',
   'Computational Data Science & Engineering': 'coe-cdse',
-  // Non-academic departments
-  'Information Technology Services': 'its',
-  'Facilities': 'facilities',
+  'Computational Science & Engineering': 'coe-cdse',
+  // ── Non-Academic / Support Departments ──
+  'Information Technology Services ITS': 'it',
+  'Information Technology Services': 'it',
+  'Facilities': 'fin-avc-facilities',
+  'Physical Plant': 'fin-avc-facilities',
+  'Human Resources': 'fin-avc-hr',
+  'Intercollegiate Athletics': 'athletics',
   'Athletics': 'athletics',
   'Student Affairs': 'student-affairs',
-  'Human Resources': 'hr',
-  'Finance & Administration': 'finance-admin',
+  'Housing and Residence Life': 'student-affairs',
+  'Memorial Union': 'student-affairs',
+  'Division of University Advancement': 'advancement',
   'University Advancement': 'advancement',
-  'Enrollment Management': 'enrollment',
+  'University Relations': 'advancement',
+  'Enrollment Mgmnt and Admissions': 'aa-enrollment',
+  'Enrollment Management': 'aa-enrollment',
+  'Financial Aid': 'aa-enrollment',
+  'University Registrar': 'aa-enrollment',
+  'Division of Research': 'research',
   'Research': 'research',
+  'Institutional Research': 'research',
+  'Library Services': 'aa-library',
   'Library': 'aa-library',
+  'Police Administration': 'fin-police',
+  'Parking Services': 'fin-police',
+  'Health Services': 'student-affairs',
+  'Counseling Services': 'student-affairs',
+  'Center for Academic Excellence': 'aa-sr-vice-provost',
+  'Provost and VC for Academic Affairs': 'provost',
+  'Chancellor': 'chancellor',
+  'Business and Finance': 'finance',
+  'Budget': 'fin-budget',
+  'Controller': 'fin-controller',
+  'Treasurer': 'fin-treasurer',
+  'Procurement Services': 'fin-procurement',
+  'The Graduate College': 'provost',
+  'Honors College': 'provost',
+  'Campus Enterprises': 'finance',
+  'N C A&T Real Estate Foundation': 'finance',
+  'Laboratory School': 'provost',
+  'Agricultural Extension': 'caes-dean',
+  'College of Ag & Environ Sciences': 'caes-dean',
+  'College of Engineering': 'coe-dean',
+  'College of Science and Technology': 'cost-dean',
+  'College of Business & Economics': 'cobe-dean',
+  'College of Health & Human Sciences': 'chhs-dean',
+  'Cntr of Excellence-Post Harvest Tec': 'caes-dean',
+  'Strategic Partnership & Economic Dv': 'provost',
+  'Minority Student Affairs': 'student-affairs',
 };
 
 // Reverse map: department aliases and fuzzy matches
@@ -255,7 +313,21 @@ function nameSimilarity(a, b) {
   const wordsA = a.split(' ');
   const wordsB = b.split(' ');
 
-  // Count matching words
+  // ── Strong signal: last name exact match + first initial match ──
+  // Handles "William Harrison" vs "W Chris Harrison"
+  // and "Benjamin Hall" vs "Ben Hall"
+  const lastA = wordsA[wordsA.length - 1];
+  const lastB = wordsB[wordsB.length - 1];
+  if (lastA === lastB && lastA.length >= 3) {
+    const firstA = wordsA[0];
+    const firstB = wordsB[0];
+    // First initial matches
+    if (firstA[0] === firstB[0]) return 0.85;
+    // One first name starts with the other (Ben/Benjamin)
+    if (firstA.startsWith(firstB.substring(0, 3)) || firstB.startsWith(firstA.substring(0, 3))) return 0.82;
+  }
+
+  // ── Word overlap approach ──
   let matches = 0;
   for (const word of wordsA) {
     if (wordsB.includes(word)) matches++;

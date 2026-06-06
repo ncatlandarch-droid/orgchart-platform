@@ -16,6 +16,7 @@ OC.ChartView = (function() {
   let isDragging = false;
   let dragStartX, dragStartY;
   let nodePositions = {};
+  let isFirstRender = true;
   const NODE_W = CONFIG.layout.chartNodeWidth;
   const NODE_H = CONFIG.layout.chartNodeHeight;
   const LEVEL_GAP = CONFIG.layout.chartLevelGap;
@@ -109,8 +110,31 @@ OC.ChartView = (function() {
     canvas.appendChild(svgLayer);
     container.appendChild(canvas);
 
-    // Center initial view
-    centerChart(totalWidth, getMaxDepth(data));
+    // Show no-results overlay if filters match zero nodes
+    const existingNoResults = Utils.$('.chart-no-results', container);
+    if (existingNoResults) existingNoResults.remove();
+    if (Store.hasActiveFilters()) {
+      const data2 = Store.getData();
+      let matchCount = 0;
+      function countMatches(node) {
+        if (Store.nodeMatchesFilters(node)) matchCount++;
+        if (node.children) node.children.forEach(countMatches);
+      }
+      countMatches(data2);
+      if (matchCount === 0) {
+        const noResults = el('div', { class: 'chart-no-results' });
+        noResults.innerHTML = '<div class="chart-no-results-icon">🔍</div>' +
+          '<div class="chart-no-results-text">No matching positions</div>' +
+          '<div class="chart-no-results-hint">Try adjusting your department or status filters</div>';
+        container.appendChild(noResults);
+      }
+    }
+
+    // On first render, center on Chancellor; otherwise keep current pan/zoom
+    if (isFirstRender) {
+      centerChart(totalWidth, getMaxDepth(data));
+      isFirstRender = false;
+    }
     applyTransform();
   }
 
@@ -134,9 +158,15 @@ OC.ChartView = (function() {
 
     // Create node element
     const isDimmed = Store.hasActiveFilters() && !Store.nodeMatchesFilters(node);
+    const tooltipParts = [node.title];
+    if (node.holder && node.holder.name) tooltipParts.push(node.holder.name);
+    if (node.department) tooltipParts.push(node.department);
+    if (hasChildren) tooltipParts.push(node.children.length + ' direct reports');
+    
     const nodeEl = el('div', {
       class: 'chart-node' + (isSelected ? ' selected' : '') + (isDimmed ? ' dimmed' : ''),
       dataset: { id: node.id },
+      title: tooltipParts.join(' · '),
       style: {
         left: (pos.x + PAD) + 'px',
         top: (pos.y + PAD) + 'px',
@@ -196,7 +226,7 @@ OC.ChartView = (function() {
     // Click to select
     nodeEl.addEventListener('click', () => {
       Store.select(node.id);
-      renderChart();
+      // store:selected event handles renderChart + zoom-to-node
       OC.TreeView.refresh();
     });
 
@@ -228,16 +258,47 @@ OC.ChartView = (function() {
   function centerChart(totalWidth, maxDepth) {
     const cw = container.clientWidth;
     const ch = container.clientHeight;
-    const chartW = totalWidth + PAD * 2;
-    const chartH = maxDepth * (NODE_H + LEVEL_GAP) + NODE_H + PAD * 2;
 
-    // Fit zoom
-    const zoomW = cw / chartW;
-    const zoomH = ch / chartH;
-    zoom = Math.min(zoomW, zoomH, 1) * 0.85;
+    // On initial load: zoom to Chancellor node, not full extents
+    const data = Store.getData();
+    if (data && nodePositions[data.id]) {
+      zoomToNode(data.id, 0.9, false);
+    } else {
+      // Fallback: fit everything
+      const chartW = totalWidth + PAD * 2;
+      const chartH = maxDepth * (NODE_H + LEVEL_GAP) + NODE_H + PAD * 2;
+      const zoomW = cw / chartW;
+      const zoomH = ch / chartH;
+      zoom = Math.min(zoomW, zoomH, 1) * 0.85;
+      panX = (cw - chartW * zoom) / 2;
+      panY = PAD;
+    }
+  }
 
-    panX = (cw - chartW * zoom) / 2;
-    panY = PAD;
+  /**
+   * Smoothly zooms and centers the chart view on a specific node.
+   * @param {string} nodeId - ID of the node to zoom to
+   * @param {number} [targetZoom=0.85] - Target zoom level
+   * @param {boolean} [animate=true] - Whether to animate the transition
+   */
+  function zoomToNode(nodeId, targetZoom = 0.85, animate = true) {
+    if (!container || !canvas) return;
+    const pos = nodePositions[nodeId];
+    if (!pos) return;
+
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+
+    // Target: center the node in the viewport
+    const nodeCenterX = pos.x + PAD + NODE_W / 2;
+    const nodeCenterY = pos.y + PAD + NODE_H / 2;
+
+    zoom = targetZoom;
+    panX = cw / 2 - nodeCenterX * zoom;
+    panY = ch / 2 - nodeCenterY * zoom;
+
+    applyTransform(animate);
+    updateZoomDisplay();
   }
 
   function applyTransform(animate) {
@@ -391,10 +452,8 @@ OC.ChartView = (function() {
     fit.addEventListener('click', () => {
       const data = Store.getData();
       if (data) {
-        const totalWidth = nodePositions[data.id] ? nodePositions[data.id].w || 1000 : 1000;
-        centerChart(totalWidth, getMaxDepth(data));
-        applyTransform();
-        updateZoomDisplay();
+        // Fit to screen = zoom to Chancellor (root)
+        zoomToNode(data.id, 0.9, true);
       }
     });
 
@@ -407,7 +466,15 @@ OC.ChartView = (function() {
       renderChart();
       renderZoomControls();
 
-      Events.on('store:selected', renderChart);
+      // When a node is selected, re-render and zoom to it
+      Events.on('store:selected', () => {
+        const selectedId = Store.getState().selectedId;
+        renderChart();
+        if (selectedId && nodePositions[selectedId]) {
+          // Zoom to the selected node after render
+          requestAnimationFrame(() => zoomToNode(selectedId, Math.max(zoom, 0.7), true));
+        }
+      });
       Events.on('store:expandAll', renderChart);
       Events.on('store:collapseAll', renderChart);
       Events.on('store:dataChanged', renderChart);
@@ -429,6 +496,7 @@ OC.ChartView = (function() {
         }
       });
     },
-    refresh: renderChart
+    refresh: renderChart,
+    zoomToNode  // Expose for external use (search, tree view clicks, etc.)
   };
 })();

@@ -216,6 +216,33 @@ OC.TreeView = (function() {
     const dropdownRow = el('div', { class: 'filter-dropdowns-row' });
     dropdownRow.appendChild(buildDeptDropdown());
     dropdownRow.appendChild(buildStatusDropdown());
+
+    // Expand / Collapse All buttons
+    const expandCollapseGroup = el('div', { class: 'expand-collapse-group' });
+    const expandAllBtn = el('button', {
+      class: 'expand-collapse-btn',
+      id: 'expand-all-btn',
+      title: 'Expand All'
+    }, '⊞ Expand All');
+    expandAllBtn.addEventListener('click', () => {
+      Store.expandAll();
+      if (OC.ChartView) OC.ChartView.refresh();
+    });
+
+    const collapseAllBtn = el('button', {
+      class: 'expand-collapse-btn',
+      id: 'collapse-all-btn',
+      title: 'Collapse All'
+    }, '⊟ Collapse All');
+    collapseAllBtn.addEventListener('click', () => {
+      Store.collapseAll();
+      if (OC.ChartView) OC.ChartView.refresh();
+    });
+
+    expandCollapseGroup.appendChild(expandAllBtn);
+    expandCollapseGroup.appendChild(collapseAllBtn);
+    dropdownRow.appendChild(expandCollapseGroup);
+
     bar.appendChild(dropdownRow);
 
     // Active tags
