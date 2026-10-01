@@ -1,48 +1,88 @@
 {
-  "generated_at": "2026-06-06T12:19:26.475Z",
+  "generated_at": "2026-10-01T12:00:48.874Z",
   "pipeline_version": "1.0.0",
   "data_sources": {
     "salary": {
-      "file": "C:\\Users\\Chris\\Desktop\\WEBSITES\\Organizational Chart\\data\\raw-employees.json",
-      "records": 1428
+      "file": "/home/runner/work/orgchart-platform/orgchart-platform/data/raw-employees.json",
+      "records": 1451
     },
     "directory": {
-      "file": "C:\\Users\\Chris\\Desktop\\WEBSITES\\Organizational Chart\\data\\directory-employees.json",
+      "file": "/home/runner/work/orgchart-platform/orgchart-platform/data/directory-employees.json",
       "records": 0
     },
     "overrides": {
-      "file": "C:\\Users\\Chris\\Desktop\\WEBSITES\\Organizational Chart\\data\\overrides.json",
+      "file": "/home/runner/work/orgchart-platform/orgchart-platform/data/overrides.json",
       "entries": 2
     },
     "existing": {
-      "file": "C:\\Users\\Chris\\Desktop\\WEBSITES\\Organizational Chart\\js\\data.js",
+      "file": "/home/runner/work/orgchart-platform/orgchart-platform/js/data.js",
       "nodes": 1400
     }
   },
   "statistics": {
-    "totalScraped": 1428,
+    "totalScraped": 1451,
     "totalExisting": 1400,
-    "newHires": 136,
-    "potentialDepartures": 193,
-    "salaryChanges": 197,
-    "unmapped": 84,
+    "newHires": 178,
+    "potentialDepartures": 216,
+    "salaryChanges": 216,
+    "unmapped": 86,
     "byClassification": {
-      "EPA": 1044,
-      "SPA": 150,
-      "Unknown": 234
+      "EPA": 1056,
+      "SPA": 149,
+      "Unknown": 246
     },
     "byCollege": {
-      "Unknown": 1428
+      "Unknown": 1451
     },
     "byLevel": {
-      "1": 1,
-      "2": 20,
+      "1": 2,
+      "2": 22,
       "3": 9,
-      "4": 138,
-      "5": 1260
+      "4": 134,
+      "5": 1284
     }
   },
   "new_hires": [
+    {
+      "name": "Michael Eccles",
+      "title": "Administrative Support Specialist",
+      "salary": 36305,
+      "department": "Student Affairs",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "student-affairs"
+    },
+    {
+      "name": "Nikita Echols",
+      "title": "Assistant Professor",
+      "salary": 72100,
+      "department": "Mathematics",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "cost-math"
+    },
+    {
+      "name": "Catherine Edmonds",
+      "title": "Director, Forever Learning",
+      "salary": 250000,
+      "department": "Provost and VC for Academic Affairs",
+      "college": "",
+      "classification": "EPA",
+      "level": 4,
+      "parentNodeId": "provost"
+    },
+    {
+      "name": "Tori Edmonson",
+      "title": "Business Officer",
+      "salary": 79310,
+      "department": "JSNN: Nanoengineering",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "jsnn-nanoeng"
+    },
     {
       "name": "Hailey Egido-Betancourt",
       "title": "Post Doctoral Research Associate - Biology",
@@ -60,6 +100,16 @@
       "department": "Agricultural Extension",
       "college": "",
       "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "William Ellington",
+      "title": "Extension Agent - Small Farms and Ag Bus. Dev. (Lee County)",
+      "salary": 43750,
+      "department": "Agricultural Extension",
+      "college": "",
+      "classification": "Unknown",
       "level": 5,
       "parentNodeId": "caes-dean"
     },
@@ -84,6 +134,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Knisha Fearrington",
+      "title": "Security Manager",
+      "salary": 63000,
+      "department": "Police Administration",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "fin-police"
+    },
+    {
       "name": "Christian Felton",
       "title": "Assistant Dean Student Success and Engagement",
       "salary": 100000,
@@ -104,6 +164,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Steven Floyd",
+      "title": "Master Police Officer I",
+      "salary": 78619,
+      "department": "Police Administration",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "fin-police"
+    },
+    {
       "name": "Isha Fofanah",
       "title": "Extension Assistant - Nutrition Training Coordinator",
       "salary": 47575,
@@ -114,6 +184,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Chloe Francis",
+      "title": "Parking Operations Manager",
+      "salary": 70000,
+      "department": "Parking Services",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "fin-police"
+    },
+    {
       "name": "Travella Free",
       "title": "Associate Professor - Extension 4-H Youth Development Specialist",
       "salary": 101000,
@@ -122,6 +202,26 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Raj GC",
+      "title": "Assistant Professor of Practice- Extension Urban Agriculture Specialist",
+      "salary": 85000,
+      "department": "Agricultural Extension",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "LaTonya Galloway",
+      "title": "Student Support Services Specialist",
+      "salary": 52000,
+      "department": "College of Health & Human Sciences",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "chhs-dean"
     },
     {
       "name": "Deshawn Gamble-Falu",
@@ -154,14 +254,14 @@
       "parentNodeId": "caes-dean"
     },
     {
-      "name": "Eric Goldston",
-      "title": "Innovation Station Driver",
-      "salary": 47380,
-      "department": "Agricultural Extension",
+      "name": "Alegro Godley",
+      "title": "Grant Accountant",
+      "salary": 58306,
+      "department": "Division of Research",
       "college": "",
       "classification": "Unknown",
       "level": 5,
-      "parentNodeId": "caes-dean"
+      "parentNodeId": "research"
     },
     {
       "name": "Aaron Golson",
@@ -172,6 +272,36 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Benjamin Grandon",
+      "title": "Extension Associate - Horticulture Unit Manager",
+      "salary": 70000,
+      "department": "Agricultural Extension",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Marquita Graves",
+      "title": "University Registrar",
+      "salary": 135000,
+      "department": "University Registrar",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "aa-enrollment"
+    },
+    {
+      "name": "Dionysus Griffith",
+      "title": "Lead Information Security Administrator/ Information Security Professional III",
+      "salary": 107000,
+      "department": "Information Technology Services ITS",
+      "college": "",
+      "classification": "SPA",
+      "level": 5,
+      "parentNodeId": "it"
     },
     {
       "name": "John Gurganus",
@@ -186,7 +316,7 @@
     {
       "name": "Salar Hafez Ghoran",
       "title": "Post Doctoral Research Associate",
-      "salary": 51912,
+      "salary": 57103,
       "department": "Cntr of Excellence-Post Harvest Tec",
       "college": "",
       "classification": "EPA",
@@ -214,6 +344,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Timothy Harris",
+      "title": "Employee Relations Consultant",
+      "salary": 73500,
+      "department": "Human Resources",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "fin-avc-hr"
+    },
+    {
       "name": "Kenya Heath",
       "title": "Grant Administrator/Business Officer II",
       "salary": 62800,
@@ -232,6 +372,16 @@
       "classification": "EPA",
       "level": 4,
       "parentNodeId": "coe-dean"
+    },
+    {
+      "name": "Asia Hill",
+      "title": "Certified Medical Assistant",
+      "salary": 47960,
+      "department": "Health Services",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "student-affairs"
     },
     {
       "name": "Jada Hines",
@@ -334,6 +484,36 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Brittany Ingram Felton",
+      "title": "Assistant Professor - Kinesiology",
+      "salary": 74000,
+      "department": "Kinesiology",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "chhs-kin"
+    },
+    {
+      "name": "Tim Isley",
+      "title": "Machine Lab Supervisor/Specialty Trades Technician",
+      "salary": 71727,
+      "department": "College of Engineering",
+      "college": "",
+      "classification": "SPA",
+      "level": 5,
+      "parentNodeId": "coe-dean"
+    },
+    {
+      "name": "Suganya Jeyaprakash",
+      "title": "Post Doctoral Scholar",
+      "salary": 60000,
+      "department": "Agricultural Extension",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
       "name": "Zongde Jiang",
       "title": "Post-Doctoral Research Associate",
       "salary": 52000,
@@ -342,6 +522,16 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Theodore Johnson",
+      "title": "Captain of Support Services",
+      "salary": 112227,
+      "department": "Police Administration",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "fin-police"
     },
     {
       "name": "Elayne Jones",
@@ -354,9 +544,19 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Kerri Jordan",
+      "title": "Assistant Director of Financial Reporting",
+      "salary": 98000,
+      "department": "Controller",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "fin-controller"
+    },
+    {
       "name": "Nitasha Kearney",
       "title": "Program Assistant- EFNEP and SNAP-ED",
-      "salary": 37051,
+      "salary": 37218,
       "department": "Agricultural Extension",
       "college": "",
       "classification": "Unknown",
@@ -402,6 +602,26 @@
       "classification": "EPA",
       "level": 4,
       "parentNodeId": "coe-dean"
+    },
+    {
+      "name": "Shae King",
+      "title": "CLOE Training Coordinator",
+      "salary": 50000,
+      "department": "Human Resources",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "fin-avc-hr"
+    },
+    {
+      "name": "Kamau Kingora",
+      "title": "Assistant Professor",
+      "salary": 98000,
+      "department": "Mechanical Engineering",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "coe-meen"
     },
     {
       "name": "Kierra Kirkland",
@@ -514,6 +734,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Ta-Wei Liu",
+      "title": "Post-Doctoral Research Associate",
+      "salary": 50400,
+      "department": "Cntr of Excellence-Post Harvest Tec",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
       "name": "Joshua Loftin",
       "title": "Visual Arts Specialist",
       "salary": 71596,
@@ -544,6 +774,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Rebecca Mabry",
+      "title": "Extension Associate ? Community Resource Development",
+      "salary": 60000,
+      "department": "Agricultural Extension",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
       "name": "Morgan Malone",
       "title": "Extension Associate - Community Foods",
       "salary": 55363,
@@ -564,9 +804,19 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Nicholas Martin",
+      "title": "Esports Coordinator",
+      "salary": 43647,
+      "department": "Student Affairs",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "student-affairs"
+    },
+    {
       "name": "Alejandra Martinez",
       "title": "Extension Agent - ANR",
-      "salary": 41500,
+      "salary": 42019,
       "department": "Agricultural Extension",
       "college": "",
       "classification": "Unknown",
@@ -644,6 +894,36 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Trevonta Mcguire",
+      "title": "Horticulture Technician",
+      "salary": 50000,
+      "department": "College of Ag & Environ Sciences",
+      "college": "",
+      "classification": "SPA",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Nicholas Milam",
+      "title": "Research Technician",
+      "salary": 45000,
+      "department": "Natural Resources & Environ Design",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-nred"
+    },
+    {
+      "name": "Connie Miller",
+      "title": "Administrative Support Specialist",
+      "salary": 52000,
+      "department": "Physician Assistant Program",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "chhs-pa"
+    },
+    {
       "name": "Michele Mims",
       "title": "Research Assistant",
       "salary": 54584,
@@ -652,6 +932,26 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Hadi Mohammed",
+      "title": "Research Associate",
+      "salary": 60000,
+      "department": "Natural Resources & Environ Design",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-nred"
+    },
+    {
+      "name": "Ashti Morovati",
+      "title": "Research Associate",
+      "salary": 65000,
+      "department": "Family and Consumer Sciences",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-fcs"
     },
     {
       "name": "Elsie Mpere",
@@ -674,6 +974,16 @@
       "parentNodeId": "cost-dean"
     },
     {
+      "name": "Anthony Nunnally",
+      "title": "Public Safety Telecommunicator",
+      "salary": 46000,
+      "department": "Police Administration",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "fin-police"
+    },
+    {
       "name": "Adrianna Odom",
       "title": "Nutrition Prog Asst SNAP-Ed",
       "salary": 36562,
@@ -692,6 +1002,16 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Juan Pace",
+      "title": "Director of Design & Construction",
+      "salary": 162000,
+      "department": "Facilities",
+      "college": "",
+      "classification": "EPA",
+      "level": 4,
+      "parentNodeId": "fin-avc-facilities"
     },
     {
       "name": "Hee Kyung Park",
@@ -786,7 +1106,7 @@
     {
       "name": "Rhonda Peters",
       "title": "Extension Agent",
-      "salary": 63401,
+      "salary": 65303,
       "department": "Agricultural Extension",
       "college": "",
       "classification": "Unknown",
@@ -854,6 +1174,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Michaela Ratliff",
+      "title": "Public Communication Specialist",
+      "salary": 63233,
+      "department": "College of Engineering",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "coe-dean"
+    },
+    {
       "name": "Atulkumar Raut",
       "title": "Post-Doctoral Research Associate",
       "salary": 53469,
@@ -874,14 +1204,14 @@
       "parentNodeId": "caes-dean"
     },
     {
-      "name": "Demetrius Richmond",
-      "title": "Assistant Dean for Student Success",
-      "salary": 101505,
-      "department": "College of Health & Human Sciences",
+      "name": "Shandra Richmond",
+      "title": "Certified Medical/Office Assistant",
+      "salary": 47960,
+      "department": "Health Services",
       "college": "",
-      "classification": "EPA",
-      "level": 4,
-      "parentNodeId": "chhs-dean"
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "student-affairs"
     },
     {
       "name": "Ishara Rijal",
@@ -902,6 +1232,16 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "LaTwan Roddey",
+      "title": "Grant Administrator/Business Officer II",
+      "salary": 62800,
+      "department": "College of Health & Human Sciences",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "chhs-dean"
     },
     {
       "name": "Addie Rodely",
@@ -936,7 +1276,7 @@
     {
       "name": "David Rowland",
       "title": "Program Assistant-ANR",
-      "salary": 45211,
+      "salary": 45562,
       "department": "Agricultural Extension",
       "college": "",
       "classification": "Unknown",
@@ -962,6 +1302,16 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Akeysha Rutledge",
+      "title": "Clinical Lecturer ? Psychiatric/Mental Health",
+      "salary": 90000,
+      "department": "School of Nursing",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "chhs-nurs"
     },
     {
       "name": "Kittrane Sanders",
@@ -1008,6 +1358,16 @@
       "title": "1890 YEA STEM Coordinator",
       "salary": 70000,
       "department": "Agricultural Extension",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Amit Sharma",
+      "title": "Post Doctoral Research Associate",
+      "salary": 50400,
+      "department": "Cntr of Excellence-Post Harvest Tec",
       "college": "",
       "classification": "EPA",
       "level": 5,
@@ -1066,12 +1426,22 @@
     {
       "name": "Lydia Stegall",
       "title": "Extension Agent - FCS",
-      "salary": 48601,
+      "salary": 48962,
       "department": "Agricultural Extension",
       "college": "",
       "classification": "Unknown",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Christine Stewart",
+      "title": "Executive Assistant to the Chancellor",
+      "salary": 78000,
+      "department": "Chancellor",
+      "college": "",
+      "classification": "EPA",
+      "level": 1,
+      "parentNodeId": "chancellor"
     },
     {
       "name": "Catherine Styers",
@@ -1144,6 +1514,16 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Briana Taylor",
+      "title": "Assistant Director of Scholarship Programs",
+      "salary": 65446,
+      "department": "Honors College",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "provost"
+    },
+    {
       "name": "Kevin Taylor",
       "title": "Student Services Specialist",
       "salary": 52805,
@@ -1162,6 +1542,16 @@
       "classification": "EPA",
       "level": 5,
       "parentNodeId": "cost-dean"
+    },
+    {
+      "name": "Shirley Terry-Smith",
+      "title": "Extension Associate - FCS",
+      "salary": 53213,
+      "department": "Agricultural Extension",
+      "college": "",
+      "classification": "Unknown",
+      "level": 5,
+      "parentNodeId": "caes-dean"
     },
     {
       "name": "Alona Thomas",
@@ -1187,7 +1577,7 @@
       "name": "Shania Troxler",
       "title": "Administrative Support Associate-YFC",
       "salary": 41000,
-      "department": "College of Ag & Environ Sciences",
+      "department": "Agricultural Extension",
       "college": "",
       "classification": "SPA",
       "level": 5,
@@ -1212,6 +1602,16 @@
       "classification": "Unknown",
       "level": 5,
       "parentNodeId": "caes-dean"
+    },
+    {
+      "name": "Willa Vance",
+      "title": "Research Technician",
+      "salary": 40000,
+      "department": "Animal Sciences",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "caes-ansc"
     },
     {
       "name": "Donna Via",
@@ -1274,9 +1674,29 @@
       "parentNodeId": "caes-dean"
     },
     {
+      "name": "Destiny Watson",
+      "title": "Helpdesk Technician",
+      "salary": 43629,
+      "department": "Information Technology Services ITS",
+      "college": "",
+      "classification": "SPA",
+      "level": 5,
+      "parentNodeId": "it"
+    },
+    {
+      "name": "April Werner",
+      "title": "Property Security Officer",
+      "salary": 42000,
+      "department": "Police Administration",
+      "college": "",
+      "classification": "EPA",
+      "level": 5,
+      "parentNodeId": "fin-police"
+    },
+    {
       "name": "Vicki Wiggins",
       "title": "Extension Agent 4-H",
-      "salary": 55687,
+      "salary": 56244,
       "department": "Agricultural Extension",
       "college": "",
       "classification": "Unknown",
@@ -1418,16 +1838,64 @@
       "level": 2
     },
     {
+      "name": "Adrienne Fuller",
+      "nodeId": "provost-fuller",
+      "title": "Elementary School Teacher",
+      "level": 5
+    },
+    {
+      "name": "William Isler",
+      "nodeId": "provost-isler",
+      "title": "Elementary School Teacher",
+      "level": 5
+    },
+    {
+      "name": "Erica McNeil",
+      "nodeId": "provost-mcneil",
+      "title": "Elementary School Teacher",
+      "level": 5
+    },
+    {
+      "name": "Serenity Ellis",
+      "nodeId": "aa-sr-vice-provost-ellis",
+      "title": "Academic Advisor",
+      "level": 5
+    },
+    {
       "name": "Rosalind Dale, Ed.D.",
       "nodeId": "aa-vp-engagement",
       "title": "Vice Provost for Engagement & Outreach",
       "level": 3
     },
     {
+      "name": "Nataly Hernandez Montes",
+      "nodeId": "aa-enrollment-montes",
+      "title": "Student Services Specialist",
+      "level": 5
+    },
+    {
+      "name": "Kevin Ross",
+      "nodeId": "aa-enrollment-ross",
+      "title": "Student Services Specialist",
+      "level": 5
+    },
+    {
+      "name": "Robert T. Muhammad",
+      "nodeId": "aa-enroll-finaid",
+      "title": "Executive Director, Financial Aid & Scholarships",
+      "level": 4
+    },
+    {
       "name": "Vicki Coleman",
       "nodeId": "aa-library",
       "title": "Dean of Library Services, F.D. Bluford Library",
       "level": 3
+    },
+    {
+      "name": "Kathryn Kehoe",
+      "nodeId": "aa-library-kehoe",
+      "title": "University Library Specialist",
+      "level": 5
     },
     {
       "name": "Stephen Bollinger",
@@ -1574,6 +2042,12 @@
       "level": 5
     },
     {
+      "name": "Vahid Hemmati",
+      "nodeId": "coe-ece-hemmati",
+      "title": "Post Doc Research Associate, Autonomous Control and Information Technology Institute",
+      "level": 5
+    },
+    {
       "name": "Dr. Numan S. Dogan",
       "nodeId": "ece-dogan",
       "title": "Professor",
@@ -1607,6 +2081,18 @@
       "name": "Kory Bennett",
       "nodeId": "ece-bennett",
       "title": "Lecturer & Director of Robotics Outreach",
+      "level": 5
+    },
+    {
+      "name": "Svitlana Fialkova",
+      "nodeId": "coe-meen-fialkova",
+      "title": "Research Scientist, Center for Advanced Materials & Smart Structures",
+      "level": 5
+    },
+    {
+      "name": "Jessica Fisher-Eaton",
+      "nodeId": "coe-meen-fishereaton",
+      "title": "Administrative Support Specialist",
       "level": 5
     },
     {
@@ -1838,6 +2324,12 @@
       "level": 4
     },
     {
+      "name": "Md. Rasel Uzzaman",
+      "nodeId": "caes-ansc-uzzaman",
+      "title": "Post Doc Research Assoc",
+      "level": 5
+    },
+    {
       "name": "Matthew O. Akindoyin",
       "nodeId": "ansc-akindoyin",
       "title": "Research Support Staff",
@@ -1859,6 +2351,12 @@
       "name": "Kimberly S. Brown",
       "nodeId": "ansc-brown",
       "title": "Research Technician",
+      "level": 5
+    },
+    {
+      "name": "Muhammad Farooq",
+      "nodeId": "caes-fcs-farooq",
+      "title": "Post-Doctoral Research Associate",
       "level": 5
     },
     {
@@ -2216,6 +2714,12 @@
       "level": 5
     },
     {
+      "name": "Brittany Ingram",
+      "nodeId": "chhs-kin-ingram",
+      "title": "Assistant Professor - Kinesiology",
+      "level": 5
+    },
+    {
       "name": "Trevor A. Brothers",
       "nodeId": "psych-brothers",
       "title": "Assistant Professor",
@@ -2402,6 +2906,12 @@
       "level": 2
     },
     {
+      "name": "Priyanka Patel",
+      "nodeId": "student-affairs-patel",
+      "title": "Medical Laboratory Technician",
+      "level": 5
+    },
+    {
       "name": "Search In Progress",
       "nodeId": "sa-dos",
       "title": "Dean of Students",
@@ -2462,10 +2972,46 @@
       "level": 3
     },
     {
+      "name": "Bosede Sanusi",
+      "nodeId": "fin-police-sanusi",
+      "title": "Property Security Officer",
+      "level": 5
+    },
+    {
+      "name": "Zaire McMican",
+      "nodeId": "fin-avc-hr-mcmican",
+      "title": "Employment Eligibility Coor",
+      "level": 5
+    },
+    {
+      "name": "Donna Miller",
+      "nodeId": "fin-avc-hr-miller",
+      "title": "Talent Solutions Consultant",
+      "level": 5
+    },
+    {
+      "name": "Ludarious Riggins",
+      "nodeId": "fin-avc-hr-riggins",
+      "title": "CAES Talent Solutions Consultant",
+      "level": 5
+    },
+    {
       "name": "William Barlow Jr.",
       "nodeId": "fin-avc-facilities",
       "title": "Associate VC of Facilities",
       "level": 3
+    },
+    {
+      "name": "Gladys Moore",
+      "nodeId": "fin-avc-facilities-moore",
+      "title": "Housekeeper",
+      "level": 5
+    },
+    {
+      "name": "Michael Stephens",
+      "nodeId": "fin-avc-facilities-stephens",
+      "title": "Utilities Mechanic (Boiler Operator)",
+      "level": 5
     },
     {
       "name": "Catherine Clark",
@@ -2474,16 +3020,28 @@
       "level": 3
     },
     {
+      "name": "Kyone' Faucette",
+      "nodeId": "fin-controller-faucette",
+      "title": "Administrative Support Specialist",
+      "level": 5
+    },
+    {
       "name": "Allison R. Chisholm",
       "nodeId": "fin-talent",
       "title": "Assistant VC for Talent Management",
       "level": 3
     },
     {
-      "name": "Maurice A. Ferrell, Ph.D.",
-      "nodeId": "it",
-      "title": "Vice Chancellor for Information Technology Services / CIO",
-      "level": 2
+      "name": "Mohammed Yassin",
+      "nodeId": "fin-treasurer-yassin",
+      "title": "Financial Analyst",
+      "level": 5
+    },
+    {
+      "name": "Destiny Springfield",
+      "nodeId": "it-springfield",
+      "title": "Helpdesk Technician",
+      "level": 5
     },
     {
       "name": "Tamara Michel Josserand, M.Ed., MBA",
@@ -2678,6 +3236,14 @@
       "changePercent": "26.6"
     },
     {
+      "name": "Maurice Ferrell",
+      "existingName": "Maurice A. Ferrell, Ph.D.",
+      "oldSalary": 255000,
+      "newSalary": 250000,
+      "change": -5000,
+      "changePercent": "-2.0"
+    },
+    {
       "name": "Vilma Ferrell",
       "existingName": "Vilma Ferrell",
       "oldSalary": 78000,
@@ -2700,6 +3266,14 @@
       "newSalary": 113642,
       "change": 28642,
       "changePercent": "33.7"
+    },
+    {
+      "name": "Shakira Foster",
+      "existingName": "Sonya Foster",
+      "oldSalary": 52394,
+      "newSalary": 40000,
+      "change": -12394,
+      "changePercent": "-23.7"
     },
     {
       "name": "Brittany Franklin",
@@ -2766,6 +3340,14 @@
       "changePercent": "20.5"
     },
     {
+      "name": "Dematus Gilmore",
+      "existingName": "Dematus Gilmore",
+      "oldSalary": 58306,
+      "newSalary": 63232,
+      "change": 4926,
+      "changePercent": "8.4"
+    },
+    {
       "name": "Gregory Goins",
       "existingName": "Gregory Goins",
       "oldSalary": 165000,
@@ -2806,6 +3388,14 @@
       "changePercent": "-8.8"
     },
     {
+      "name": "Margo Hairston",
+      "existingName": "Margo Hairston",
+      "oldSalary": 52900,
+      "newSalary": 64000,
+      "change": 11100,
+      "changePercent": "21.0"
+    },
+    {
       "name": "Benjamin Hall",
       "existingName": "Ben Hall",
       "oldSalary": 125000,
@@ -2828,6 +3418,14 @@
       "newSalary": 125000,
       "change": -15000,
       "changePercent": "-10.7"
+    },
+    {
+      "name": "Tracey Harper",
+      "existingName": "Tracey Harper",
+      "oldSalary": 75000,
+      "newSalary": 88715,
+      "change": 13715,
+      "changePercent": "18.3"
     },
     {
       "name": "Dominique Harrison",
@@ -2892,6 +3490,14 @@
       "newSalary": 156560,
       "change": 1560,
       "changePercent": "1.0"
+    },
+    {
+      "name": "Sallie Hayes-Williams",
+      "existingName": "Sallie Hayes-Williams",
+      "oldSalary": 46350,
+      "newSalary": 50831,
+      "change": 4481,
+      "changePercent": "9.7"
     },
     {
       "name": "Jeffery Haynes",
@@ -2990,6 +3596,14 @@
       "changePercent": "-7.6"
     },
     {
+      "name": "Ravinder Jain",
+      "existingName": "Ravinder Jain",
+      "oldSalary": 215000,
+      "newSalary": 154111,
+      "change": -60889,
+      "changePercent": "-28.3"
+    },
+    {
       "name": "Floyd James",
       "existingName": "Floyd J. James",
       "oldSalary": 88000,
@@ -3014,20 +3628,20 @@
       "changePercent": "7.5"
     },
     {
+      "name": "Beneisha Johnson",
+      "existingName": "Benny Johnson",
+      "oldSalary": 56018,
+      "newSalary": 56650,
+      "change": 632,
+      "changePercent": "1.1"
+    },
+    {
       "name": "Laquanda Johnson",
       "existingName": "Laquanda L. Johnson",
       "oldSalary": 90000,
       "newSalary": 141000,
       "change": 51000,
       "changePercent": "56.7"
-    },
-    {
-      "name": "Lizbeth Johnson",
-      "existingName": "Lizbeth Johnson",
-      "oldSalary": 175000,
-      "newSalary": 165000,
-      "change": -10000,
-      "changePercent": "-5.7"
     },
     {
       "name": "Semaj Johnson",
@@ -3294,6 +3908,14 @@
       "changePercent": "-13.5"
     },
     {
+      "name": "Erika Love",
+      "existingName": "Edward Love",
+      "oldSalary": 48831,
+      "newSalary": 47575,
+      "change": -1256,
+      "changePercent": "-2.6"
+    },
+    {
       "name": "Rashanda Lowery",
       "existingName": "Rashanda L. Lowery",
       "oldSalary": 115000,
@@ -3364,6 +3986,22 @@
       "newSalary": 185400,
       "change": 20400,
       "changePercent": "12.4"
+    },
+    {
+      "name": "Madeline Martinez",
+      "existingName": "Madeline Martinez",
+      "oldSalary": 87550,
+      "newSalary": 130000,
+      "change": 42450,
+      "changePercent": "48.5"
+    },
+    {
+      "name": "Torie Mastrogianakis",
+      "existingName": "Torie Mastrogianakis",
+      "oldSalary": 44000,
+      "newSalary": 57638,
+      "change": 13638,
+      "changePercent": "31.0"
     },
     {
       "name": "Maranda McBride",
@@ -3486,14 +4124,6 @@
       "changePercent": "6.7"
     },
     {
-      "name": "Robert Muhammad",
-      "existingName": "Robert T. Muhammad",
-      "oldSalary": 130000,
-      "newSalary": 144359,
-      "change": 14359,
-      "changePercent": "11.0"
-    },
-    {
       "name": "Dawn Murphy",
       "existingName": "Dawn F. Murphy, Ph.D.",
       "oldSalary": 155000,
@@ -3532,6 +4162,14 @@
       "newSalary": 110000,
       "change": 30000,
       "changePercent": "37.5"
+    },
+    {
+      "name": "Marcello Newkirk",
+      "existingName": "Marcello Newkirk",
+      "oldSalary": 42500,
+      "newSalary": 50000,
+      "change": 7500,
+      "changePercent": "17.6"
     },
     {
       "name": "Louisa Newman",
@@ -3652,6 +4290,14 @@
       "newSalary": 164000,
       "change": 74000,
       "changePercent": "82.2"
+    },
+    {
+      "name": "Nicholas Poole",
+      "existingName": "Nicholas Poole",
+      "oldSalary": 68176,
+      "newSalary": 78619,
+      "change": 10443,
+      "changePercent": "15.3"
     },
     {
       "name": "Trina Pratt",
@@ -3790,6 +4436,14 @@
       "changePercent": "-3.1"
     },
     {
+      "name": "Brittany Sanders",
+      "existingName": "Brittany Sanders",
+      "oldSalary": 66000,
+      "newSalary": 72600,
+      "change": 6600,
+      "changePercent": "10.0"
+    },
+    {
       "name": "Shengmin Sang",
       "existingName": "Shengmin Sang",
       "oldSalary": 105000,
@@ -3812,6 +4466,14 @@
       "newSalary": 126682,
       "change": 34682,
       "changePercent": "37.7"
+    },
+    {
+      "name": "Michael Shy",
+      "existingName": "Michael Shy",
+      "oldSalary": 43260,
+      "newSalary": 59522,
+      "change": 16262,
+      "changePercent": "37.6"
     },
     {
       "name": "Todd Simmons",
@@ -3838,6 +4500,14 @@
       "changePercent": "10.4"
     },
     {
+      "name": "Sarah Small",
+      "existingName": "Sarah Small",
+      "oldSalary": 56650,
+      "newSalary": 62000,
+      "change": 5350,
+      "changePercent": "9.4"
+    },
+    {
       "name": "Claudette Smith",
       "existingName": "Catina Smith",
       "oldSalary": 43460,
@@ -3854,12 +4524,12 @@
       "changePercent": "-71.2"
     },
     {
-      "name": "Shirley Smith",
-      "existingName": "Susan Smith",
-      "oldSalary": 47650,
-      "newSalary": 53213,
+      "name": "Penelope Smith",
+      "existingName": "Penelope Smith",
+      "oldSalary": 55630,
+      "newSalary": 61193,
       "change": 5563,
-      "changePercent": "11.7"
+      "changePercent": "10.0"
     },
     {
       "name": "Evelyn Sowells-Boone",
@@ -3892,6 +4562,14 @@
       "newSalary": 74056,
       "change": -5944,
       "changePercent": "-7.4"
+    },
+    {
+      "name": "Samuel Sutton",
+      "existingName": "Samuel Sutton",
+      "oldSalary": 68176,
+      "newSalary": 78619,
+      "change": 10443,
+      "changePercent": "15.3"
     },
     {
       "name": "Reza Tahergorabi",
@@ -4022,6 +4700,22 @@
       "changePercent": "90.5"
     },
     {
+      "name": "Alexis Williams",
+      "existingName": "Ava Williams",
+      "oldSalary": 62443,
+      "newSalary": 43888,
+      "change": -18555,
+      "changePercent": "-29.7"
+    },
+    {
+      "name": "Anthony Williams",
+      "existingName": "Ava Williams",
+      "oldSalary": 62443,
+      "newSalary": 82000,
+      "change": 19557,
+      "changePercent": "31.3"
+    },
+    {
       "name": "Leonard Williams",
       "existingName": "Lougenia Williams",
       "oldSalary": 40148,
@@ -4038,6 +4732,14 @@
       "changePercent": "18.2"
     },
     {
+      "name": "TaJuan Wilson",
+      "existingName": "Tajahn Wilson",
+      "oldSalary": 42000,
+      "newSalary": 320000,
+      "change": 278000,
+      "changePercent": "661.9"
+    },
+    {
       "name": "Danielle Winchester",
       "existingName": "Dr. Danielle Winchester",
       "oldSalary": 172000,
@@ -4052,6 +4754,14 @@
       "newSalary": 105328,
       "change": 328,
       "changePercent": "0.3"
+    },
+    {
+      "name": "Floyd Wright",
+      "existingName": "Floyd Wright",
+      "oldSalary": 74450,
+      "newSalary": 75880,
+      "change": 1430,
+      "changePercent": "1.9"
     },
     {
       "name": "Darryl Wright-Greene",
@@ -4144,6 +4854,12 @@
   ],
   "unmapped_employees": [
     {
+      "name": "Yolandas Elias",
+      "title": "Executive Assistant",
+      "department": "College of Education",
+      "college": ""
+    },
+    {
       "name": "Hermene Elks",
       "title": "Fitness Coordinator",
       "department": "Intramural Sports",
@@ -4171,6 +4887,18 @@
       "name": "Chantal Fleming",
       "title": "Executive Director of TRIO",
       "department": "Student Support Services",
+      "college": ""
+    },
+    {
+      "name": "Brittany Foreshaw",
+      "title": "Administrative Support Specialist",
+      "department": "VP for Undergraduate Programs",
+      "college": ""
+    },
+    {
+      "name": "Tamie Fox",
+      "title": "Administrative Support Assoc",
+      "department": "Payroll",
       "college": ""
     },
     {
@@ -4279,6 +5007,12 @@
       "name": "Anitra Hilliard",
       "title": "Access Coordinator",
       "department": "VP for Undergraduate Programs",
+      "college": ""
+    },
+    {
+      "name": "Shonda Holmes",
+      "title": "Financial Reporting Accountant",
+      "department": "Financial Reporting",
       "college": ""
     },
     {
@@ -4426,12 +5160,6 @@
       "college": ""
     },
     {
-      "name": "Penelope Oglesby",
-      "title": "Executive Assistant",
-      "department": "College of Arts Humanities, Soc Sci",
-      "college": ""
-    },
-    {
       "name": "Ranga Krishna Reddy Palugulla",
       "title": "Data Management Specialist",
       "department": "College of Education",
@@ -4468,21 +5196,9 @@
       "college": ""
     },
     {
-      "name": "Caitlin Reavis",
-      "title": "Business Officer II / Program Manager, The Center of Excellence in Cybersecurity Research, Education",
-      "department": "Cntr of Excell-Cybersecurity Resrch",
-      "college": ""
-    },
-    {
       "name": "Gerald Reynolds",
       "title": "Grant Administrator",
       "department": "Sponsored Programs",
-      "college": ""
-    },
-    {
-      "name": "Heather Roberts",
-      "title": "Administrative Support Specialist",
-      "department": "Intramural Sports",
       "college": ""
     },
     {
@@ -4516,6 +5232,12 @@
       "college": ""
     },
     {
+      "name": "Duncan Sinclair",
+      "title": "Lead EHS Professional",
+      "department": "Environmental Health and Safety",
+      "college": ""
+    },
+    {
       "name": "Samiya Smalls",
       "title": "Executive Assistant",
       "department": "Military Science",
@@ -4531,6 +5253,12 @@
       "name": "Gerald Spates",
       "title": "Director of Multicultural Student Center",
       "department": "Dean of Students",
+      "college": ""
+    },
+    {
+      "name": "Shilpa Srinivasa",
+      "title": "Grant Administrator",
+      "department": "College of Education",
       "college": ""
     },
     {
@@ -4609,12 +5337,6 @@
       "name": "Jared Webb",
       "title": "Undergraduate Research Center Director",
       "department": "VP for Undergraduate Programs",
-      "college": ""
-    },
-    {
-      "name": "Patricia White",
-      "title": "Director of Continuing Education and Summer Sessions",
-      "department": "Summer Sch & Outreach Programs",
       "college": ""
     },
     {
